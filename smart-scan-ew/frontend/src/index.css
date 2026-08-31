@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ──────────────────────────────────────────────
+   Smart Scan EW — Global Styles
+   ────────────────────────────────────────────── */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --glow-tactical: rgba(0, 230, 147, 0.4);
+  --glow-radar: rgba(0, 115, 230, 0.4);
+  --glow-hit: rgba(34, 197, 94, 0.6);
+  --glow-miss: rgba(239, 68, 68, 0.6);
+  --surface-glass: rgba(15, 22, 35, 0.6);
+}
+
+body {
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #0a0e17 0%, #0f1623 50%, #0a0e17 100%);
+  min-height: 100vh;
+}
+
+/* Glassmorphism card */
+@layer components {
+  .glass-card {
+    @apply bg-surface-800/60 backdrop-blur-md border border-surface-600/30 rounded-xl;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-card-glow {
+    @apply glass-card;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3),
+                0 0 15px var(--glow-tactical),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold font-mono tracking-tight;
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  .stat-label {
+    @apply text-xs uppercase tracking-widest text-gray-400 mt-1;
+  }
+
+  .btn-tactical {
+    @apply px-6 py-2.5 rounded-lg font-semibold text-sm uppercase tracking-wider
+           transition-all duration-300 ease-out
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-900;
+  }
+
+  .btn-start {
+    @apply btn-tactical bg-tactical-600 hover:bg-tactical-500 text-white
+           focus:ring-tactical-500 hover:shadow-lg;
+    box-shadow: 0 0 15px rgba(0, 230, 147, 0.2);
+  }
+
+  .btn-start:hover {
+    box-shadow: 0 0 25px rgba(0, 230, 147, 0.4);
+  }
+
+  .btn-stop {
+    @apply btn-tactical bg-red-600/80 hover:bg-red-500 text-white
+           focus:ring-red-500 hover:shadow-lg;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+  }
+
+  .connection-dot {
+    @apply w-2.5 h-2.5 rounded-full;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .connection-dot-connected {
+    @apply connection-dot bg-tactical-400;
+    box-shadow: 0 0 8px var(--glow-tactical);
+  }
+
+  .connection-dot-disconnected {
+    @apply connection-dot bg-red-500;
+    box-shadow: 0 0 8px var(--glow-miss);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f1623;
+}
+::-webkit-scrollbar-thumb {
+  background: #212e45;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3f5e;
+}
+
+/* Canvas container */
+.waterfall-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.waterfall-container canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* Animated gradient border */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0,230,147,0.3), rgba(0,115,230,0.3), rgba(0,230,147,0.3));
+  background-size: 200% 200%;
+  animation: gradient-rotate 4s ease infinite;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+@keyframes gradient-rotate {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
