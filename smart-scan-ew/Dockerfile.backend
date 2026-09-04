@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy requirements and install
+COPY backend/requirements.txt /app/backend/
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+# Copy source code
+COPY backend /app/backend
+COPY ai_engine /app/ai_engine
+
+# Set PYTHONPATH to root so ai_engine can be found
+ENV PYTHONPATH=/app
+
+# Uvicorn expects to run from the directory containing `app`
+WORKDIR /app/backend
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
