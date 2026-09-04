@@ -1,16 +1,25 @@
 """
-Smart Scan EW — Thread-Safe State Manager
-==========================================
+Smart Scan EW — Thread-Safe State Manager (Enhanced)
+======================================================
 Shared memory container that bridges the RF simulation loop,
 the RL inference engine, and the WebSocket broadcaster.
 All mutations are protected by a threading.Lock.
+
+Enhanced with:
+- Session tracking with unique IDs
+- Metrics history buffer for analytics
+- Thread-safe session management
 """
 
 import threading
 import time
+import uuid
 import numpy as np
 from typing import Dict, Any, List, Optional
-from app.config import NUM_CHANNELS, CHANNEL_FREQS_GHZ
+from app.config import NUM_CHANNELS, CHANNEL_FREQS_GHZ, SessionInfo
+from app.logger import get_logger
+
+log = get_logger("state")
 
 
 class SystemState:
@@ -58,6 +67,73 @@ class SystemState:
         self.channel_visit_counts: np.ndarray = np.zeros(num_channels, dtype=np.int64)
         self.channel_last_visit: np.ndarray = np.zeros(num_channels, dtype=np.float64)
         self.channel_hit_counts: np.ndarray = np.zeros(num_channels, dtype=np.int64)
+
+        # ── Session Tracking ──
+        self._current_session_id: Optional[str] = None
+        self._session_start_time: Optional[float] = None
+        self._session_history: List[SessionInfo] = []
+        self._metrics_history: List[Dict[str, float]] = []  # Sampled metrics for analytics
+        self._metrics_sample_interval: int = 30  # Sample every N hops
+
+    def start_session(self, mode: str = "synthetic", num_emitters: int = 2) -> str:
+        """Start a new scan session and return its ID."""
+        with self._lock:
+            session_id = str(uuid.uuid4())[:8]
+            self._current_session_id = session_id
+            self._session_start_time = time.time()
+            self.mode = mode
+            self.is_running = True
+            log.info(f"Session {session_id} started (mode={mode}, emitters={num_emitters})")
+            return session_id
+
+    def end_session(self) -> Optional[SessionInfo]:
+        """End the current session and archive it."""
+        with self._lock:
+            if not self._current_session_id:
+                return None
+
+            session = SessionInfo(
+                session_id=self._current_session_id,
+                start_time=self._session_start_time,
+                end_time=time.time(),
+                total_hops=self.total_hops,
+                total_hits=self.total_hits,
+                final_pd=round(self.pd, 4),
+                final_pfa=round(self.pfa, 4),
+                final_reward=round(self.episode_reward, 2),
+                mode=self.mode,
+                num_channels=self.num_channels,
+            )
+            self._session_history.append(session)
+            self.is_running = False
+
+            # Keep last 50 sessions
+            if len(self._session_history) > 50:
+                self._session_history = self._session_history[-50:]
+
+            log.info(
+                f"Session {self._current_session_id} ended "
+                f"(hops={self.total_hops}, hits={self.total_hits}, pd={self.pd:.3f})"
+            )
+
+            self._current_session_id = None
+            self._session_start_time = None
+            return session
+
+    def get_session_history(self) -> List[Dict[str, Any]]:
+        """Return serializable session history."""
+        with self._lock:
+            return [s.model_dump() for s in self._session_history]
+
+    def get_analytics(self) -> Dict[str, Any]:
+        """Return analytics data including metrics history and session summary."""
+        with self._lock:
+            return {
+                "current_session": self._current_session_id,
+                "session_count": len(self._session_history),
+                "metrics_history": list(self._metrics_history[-200:]),
+                "sessions": [s.model_dump() for s in self._session_history[-10:]],
+            }
 
     def update(
         self,
@@ -112,6 +188,20 @@ class SystemState:
             if is_hit:
                 self.channel_hit_counts[tuned_channel] += 1
 
+            # Sample metrics for analytics history
+            if self.total_hops % self._metrics_sample_interval == 0:
+                self._metrics_history.append({
+                    "hop": self.total_hops,
+                    "pd": round(self.pd, 4),
+                    "pfa": round(self.pfa, 4),
+                    "hits": self.total_hits,
+                    "reward": round(self.episode_reward, 2),
+                    "timestamp": self.timestamp,
+                })
+                # Cap history
+                if len(self._metrics_history) > 1000:
+                    self._metrics_history = self._metrics_history[-500:]
+
     def snapshot(self) -> Dict[str, Any]:
         """Return a JSON-serializable copy of the current state."""
         with self._lock:
@@ -130,6 +220,7 @@ class SystemState:
                 "reward": round(self.reward, 4),
                 "episode_reward": round(self.episode_reward, 4),
                 "mode": self.mode,
+                "session_id": self._current_session_id,
             }
 
     def get_node_features(self) -> np.ndarray:
@@ -177,4 +268,6 @@ class SystemState:
     def reset_all(self) -> None:
         """Full reset of all state."""
         with self._lock:
+            session_history = self._session_history  # Preserve history
             self.__init__(self.num_channels)
+            self._session_history = session_history

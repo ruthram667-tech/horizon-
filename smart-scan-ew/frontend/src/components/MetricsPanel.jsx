@@ -1,8 +1,8 @@
 /**
- * Smart Scan EW — Metrics Panel
- * ===============================
- * Tactical metrics grid showing live detection performance.
- * Glassmorphic stat cards with animated values and status indicators.
+ * Smart Scan EW — Metrics Panel (Enhanced)
+ * ==========================================
+ * Tactical metrics grid with animated ring gauges, sparklines,
+ * and status indicators. Premium glassmorphic design.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -41,6 +41,34 @@ function AnimatedNumber({ value, decimals = 1, suffix = '' }) {
       {typeof display === 'number' ? display.toFixed(decimals) : '—'}
       {suffix}
     </span>
+  );
+}
+
+function MiniRingGauge({ value, size = 48, strokeWidth = 4, color = '#00e693' }) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.min(Math.max(value, 0), 1);
+  const offset = circumference - progress * circumference;
+
+  return (
+    <div className="ring-gauge" style={{ width: size, height: size }}>
+      <svg width={size} height={size}>
+        <circle
+          className="ring-gauge-track"
+          cx={size/2} cy={size/2} r={radius}
+          strokeWidth={strokeWidth}
+        />
+        <circle
+          className="ring-gauge-fill"
+          cx={size/2} cy={size/2} r={radius}
+          strokeWidth={strokeWidth}
+          stroke={color}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          style={{ filter: `drop-shadow(0 0 4px ${color}40)` }}
+        />
+      </svg>
+    </div>
   );
 }
 
@@ -142,54 +170,48 @@ export default function MetricsPanel({ data }) {
           <span className="text-radar-400 mr-2">◆</span>
           Tactical Metrics
         </h2>
-        <span className="text-xs text-gray-500 font-mono">
+        <span className="text-xs text-gray-500 font-mono flex items-center gap-1.5">
           LIVE
-          <span className="inline-block w-1.5 h-1.5 bg-tactical-400 rounded-full ml-1.5 animate-pulse" />
+          <span className="inline-block w-1.5 h-1.5 bg-tactical-400 rounded-full animate-pulse" />
         </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         {/* Detection Probability */}
-        <div className="glass-card p-3 relative overflow-hidden group hover:border-tactical-500/30 transition-colors">
-          <div className="flex items-center justify-between mb-1">
-            <StatusIndicator value={pd} thresholds={{ good: 0.6, warn: 0.3 }} />
+        <div className="glass-card p-3 relative overflow-hidden group hover:border-tactical-500/30 transition-all duration-300">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <MiniRingGauge value={pd} size={36} strokeWidth={3} color="#00e693" />
+              <StatusIndicator value={pd} thresholds={{ good: 0.6, warn: 0.3 }} />
+            </div>
             <MiniSparkline values={pdHistory} color="#00e693" />
           </div>
           <div className="stat-value text-tactical-400">
             <AnimatedNumber value={pd * 100} decimals={1} suffix="%" />
           </div>
           <div className="stat-label">Detection Prob (P<sub>d</sub>)</div>
-          {/* Radial gauge background */}
-          <div
-            className="absolute -bottom-4 -right-4 w-20 h-20 rounded-full opacity-10"
-            style={{
-              background: `conic-gradient(#00e693 ${pd * 360}deg, transparent 0deg)`,
-            }}
-          />
         </div>
 
         {/* False Alarm Rate */}
-        <div className="glass-card p-3 relative overflow-hidden group hover:border-amber-500/30 transition-colors">
-          <div className="flex items-center justify-between mb-1">
-            <StatusIndicator value={1 - pfa} thresholds={{ good: 0.95, warn: 0.8 }} />
+        <div className="glass-card p-3 relative overflow-hidden group hover:border-amber-500/30 transition-all duration-300">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <MiniRingGauge value={1 - pfa} size={36} strokeWidth={3} color="#f59e0b" />
+              <StatusIndicator value={1 - pfa} thresholds={{ good: 0.95, warn: 0.8 }} />
+            </div>
             <MiniSparkline values={pfaHistory} color="#f59e0b" />
           </div>
           <div className="stat-value text-amber-400">
             <AnimatedNumber value={pfa * 100} decimals={2} suffix="%" />
           </div>
           <div className="stat-label">False Alarm (P<sub>fa</sub>)</div>
-          <div
-            className="absolute -bottom-4 -right-4 w-20 h-20 rounded-full opacity-10"
-            style={{
-              background: `conic-gradient(#f59e0b ${pfa * 360}deg, transparent 0deg)`,
-            }}
-          />
         </div>
 
         {/* Total Intercepts */}
-        <div className="glass-card p-3 group hover:border-radar-500/30 transition-colors">
-          <div className="flex items-center gap-2 mb-1">
+        <div className="glass-card p-3 group hover:border-radar-500/30 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">🎯</span>
+            <StatusIndicator value={efficiency} thresholds={{ good: 0.3, warn: 0.1 }} />
           </div>
           <div className="stat-value text-radar-400">
             {totalHits}
@@ -201,9 +223,9 @@ export default function MetricsPanel({ data }) {
         </div>
 
         {/* Tuner Efficiency */}
-        <div className="glass-card p-3 group hover:border-purple-500/30 transition-colors">
-          <div className="flex items-center gap-2 mb-1">
-            <StatusIndicator value={efficiency} thresholds={{ good: 0.4, warn: 0.15 }} />
+        <div className="glass-card p-3 group hover:border-purple-500/30 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-2">
+            <MiniRingGauge value={efficiency} size={36} strokeWidth={3} color="#a855f7" />
           </div>
           <div className="stat-value text-purple-400">
             <AnimatedNumber value={efficiency * 100} decimals={1} suffix="%" />

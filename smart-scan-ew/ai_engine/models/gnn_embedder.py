@@ -1,12 +1,15 @@
 """
-Smart Scan EW — GNN Embedder
-==============================
-2-layer Graph Attention Network (GAT) using PyTorch Geometric.
-Produces per-channel node embeddings that encode relational spectrum state:
-spectral adjacency, observed hop transitions, and per-channel features.
+Smart Scan EW — GNN Embedder (Enhanced)
+=========================================
+2-layer Graph Attention Network (GAT) with:
+- Skip connections (residual)
+- Layer normalization
+- Edge attention weights from transition probabilities
+Produces per-channel node embeddings for RL policy consumption.
 """
 
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from typing import Optional, Tuple
@@ -28,15 +31,14 @@ from backend.app.config import (
 
 class GNNEmbedder(torch.nn.Module):
     """
-    2-layer Graph Attention Network for spectrum state encoding.
-    
+    Enhanced 2-layer GAT with skip connections and layer normalization.
+
     Architecture:
-        Input:  Data(x=[N, 4], edge_index=[2, E])
-                Node features: [latest_rssi, dwell_time, duty_cycle, detection_prob]
-        Layer1: GATConv(4 → 32, heads=4) → ELU → Dropout(0.3)   # output: [N, 128]
-        Layer2: GATConv(128 → 32, heads=1, concat=False)          # output: [N, 32]
-    
-    Outputs [N, 32] node embeddings representing relational spectrum states.
+        Input:  Data(x=[N, 4], edge_index=[2, E], edge_attr=[E, 1])
+        Proj:   Linear(4 → 128) — project input to hidden dimension
+        Layer1: GATConv(128 → 32, heads=4) + LayerNorm + ELU + Skip
+        Layer2: GATConv(128 → 32, heads=1) + LayerNorm + Skip
+        Output: [N, 32] node embeddings
     """
 
     def __init__(
@@ -56,49 +58,64 @@ class GNNEmbedder(torch.nn.Module):
             )
 
         self.dropout = dropout
+        self.hidden_dim = hidden_channels * heads  # 32 * 4 = 128
 
-        # Layer 1: Multi-head GAT
-        # Input: [N, in_channels=4]
-        # Output: [N, hidden_channels * heads = 32 * 4 = 128]
+        # Input projection: [N, 4] → [N, 128]
+        self.input_proj = nn.Sequential(
+            nn.Linear(in_channels, self.hidden_dim),
+            nn.ELU(),
+        )
+
+        # Layer 1: Multi-head GAT with skip connection
         self.conv1 = GATConv(
-            in_channels,
+            self.hidden_dim,
             hidden_channels,
             heads=heads,
             dropout=dropout,
             concat=True,
         )
+        self.norm1 = nn.LayerNorm(self.hidden_dim)
 
-        # Layer 2: Single-head GAT (aggregation)
-        # Input: [N, hidden_channels * heads = 128]
-        # Output: [N, out_channels = 32]
+        # Layer 2: Single-head GAT with skip connection
         self.conv2 = GATConv(
-            hidden_channels * heads,
+            self.hidden_dim,
             out_channels,
             heads=1,
             concat=False,
             dropout=dropout,
         )
+        self.norm2 = nn.LayerNorm(out_channels)
+
+        # Skip projection for layer 2 (128 → 32)
+        self.skip_proj = nn.Linear(self.hidden_dim, out_channels)
 
     def forward(self, data) -> torch.Tensor:
         """
-        Forward pass through the GAT.
-        
+        Forward pass through the enhanced GAT.
+
         Args:
-            data: PyG Data object with x=[N, 4] and edge_index=[2, E]
-            
+            data: PyG Data with x=[N, 4] and edge_index=[2, E]
+
         Returns:
-            Node embeddings of shape [N, out_channels]
+            Node embeddings [N, out_channels=32]
         """
         x, edge_index = data.x, data.edge_index
 
-        # Layer 1
+        # Input projection
+        x = self.input_proj(x)  # [N, 128]
+        residual = x
+
+        # Layer 1 + skip connection
         x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.conv1(x, edge_index)
+        x = self.conv1(x, edge_index)  # [N, 128]
+        x = self.norm1(x + residual)   # Skip connection
         x = F.elu(x)
 
-        # Layer 2
+        # Layer 2 + skip connection
+        residual2 = self.skip_proj(x)  # [N, 32]
         x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.conv2(x, edge_index)
+        x = self.conv2(x, edge_index)  # [N, 32]
+        x = self.norm2(x + residual2)  # Skip connection
 
         return x
 
@@ -111,18 +128,18 @@ def build_graph(
 ) -> 'Data':
     """
     Construct a PyG Data object from channel features and adjacency info.
-    
+
     Edges come from two sources:
     1. Spectral adjacency: neighboring channels are always connected (±1, ±2)
     2. Observed hop transitions: non-adjacent channels connected if
        transition count exceeds threshold
-    
+
     Args:
         node_features: [N, 4] array of per-channel features
         num_channels: Number of frequency channels
         observed_transitions: [N, N] matrix of hop transition counts (optional)
         transition_threshold: Minimum normalized transition prob to create edge
-        
+
     Returns:
         PyG Data object ready for GNN forward pass
     """
@@ -131,6 +148,7 @@ def build_graph(
 
     edges_src = []
     edges_dst = []
+    edge_weights = []
 
     # 1. Spectral adjacency edges (channels within ±2 of each other)
     for i in range(num_channels):
@@ -139,6 +157,8 @@ def build_graph(
             if 0 <= j < num_channels:
                 edges_src.append(i)
                 edges_dst.append(j)
+                # Weight by proximity
+                edge_weights.append(1.0 / abs(offset))
 
     # 2. Observed transition edges (from hop history)
     if observed_transitions is not None:
@@ -153,16 +173,19 @@ def build_graph(
                     if normalized[i, j] > transition_threshold:
                         edges_src.append(i)
                         edges_dst.append(j)
+                        edge_weights.append(float(normalized[i, j]))
 
     # Add self-loops
     for i in range(num_channels):
         edges_src.append(i)
         edges_dst.append(i)
+        edge_weights.append(1.0)
 
     edge_index = torch.tensor([edges_src, edges_dst], dtype=torch.long)
     x = torch.tensor(node_features, dtype=torch.float32)
+    edge_attr = torch.tensor(edge_weights, dtype=torch.float32).unsqueeze(1)
 
-    return Data(x=x, edge_index=edge_index)
+    return Data(x=x, edge_index=edge_index, edge_attr=edge_attr)
 
 
 class GNNInference:
@@ -188,7 +211,7 @@ class GNNInference:
     ) -> np.ndarray:
         """
         Get node embeddings from current spectrum state.
-        
+
         Returns:
             np.ndarray of shape [N, 32]
         """

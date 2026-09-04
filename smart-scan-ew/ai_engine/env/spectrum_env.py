@@ -1,9 +1,11 @@
 """
-Smart Scan EW — Custom Gymnasium Environment
-==============================================
-SpectrumScanEnv: A Gymnasium-compatible environment that simulates
-the RF scanning problem. The agent decides which channel to tune to,
-and receives rewards based on intercept success, misses, and switching cost.
+Smart Scan EW — Custom Gymnasium Environment (Enhanced)
+=========================================================
+SpectrumScanEnv with:
+- Shaped reward function (proximity bonus, exploration bonus)
+- Observation normalization (running mean/std)
+- Multi-emitter scaling (dynamic difficulty)
+- Curriculum learning support
 
 State: Concatenation of GNN node embeddings + one-hot current channel position.
 Action: Discrete channel index to tune to.
@@ -26,7 +28,7 @@ from app.config import (
 )
 from dsp.rf_simulator import RFSimulator
 
-# Conditionally import GNN — fall back to random embeddings if unavailable
+# Conditionally import GNN
 try:
     from ai_engine.models.gnn_embedder import GNNEmbedder, build_graph
     import torch
@@ -35,28 +37,40 @@ except ImportError:
     HAS_GNN = False
 
 
+class RunningStats:
+    """Welford's online algorithm for running mean and variance."""
+
+    def __init__(self, shape):
+        self.n = 0
+        self.mean = np.zeros(shape, dtype=np.float64)
+        self.M2 = np.zeros(shape, dtype=np.float64)
+
+    def update(self, x):
+        self.n += 1
+        delta = x - self.mean
+        self.mean += delta / self.n
+        delta2 = x - self.mean
+        self.M2 += delta * delta2
+
+    @property
+    def std(self):
+        if self.n < 2:
+            return np.ones_like(self.mean)
+        return np.sqrt(self.M2 / (self.n - 1)) + 1e-8
+
+    def normalize(self, x):
+        return (x - self.mean) / self.std
+
+
 class SpectrumScanEnv(gym.Env):
     """
-    Custom Gymnasium environment for RF spectrum scanning.
-    
-    The agent controls a receiver tuner that can listen on one channel
-    at a time. FHSS emitters hop across channels, and the agent must
-    intercept (tune to) active channels to score hits.
-    
-    Observation Space:
-        Concatenation of:
-        - GNN node embeddings: [N × embedding_dim] flattened
-        - One-hot current channel: [N]
-        Total dimension: N * embedding_dim + N
-        
-    Action Space:
-        Discrete(N) — index of target channel to tune to
-        
-    Reward:
-        +10.0  — intercept hit (tuned to active channel)
-        -1.0   — empty/noise scan (tuned to inactive channel)
-        -5.0   — per missed active channel (active but not tuned)
-        -α|Δf| — switching penalty proportional to frequency distance
+    Enhanced Gymnasium environment for RF spectrum scanning.
+
+    Improvements:
+    - Shaped reward: proximity bonus for near-hits, exploration bonus
+    - Observation normalization for stable training
+    - Curriculum learning: start easy, increase difficulty
+    - Dynamic emitter count changes mid-episode
     """
 
     metadata = {"render_modes": ["human", "ansi"]}
@@ -69,6 +83,12 @@ class SpectrumScanEnv(gym.Env):
         episode_length: int = EPISODE_LENGTH,
         use_gnn: bool = True,
         render_mode: Optional[str] = None,
+        # Curriculum learning
+        curriculum: bool = False,
+        min_emitters: int = 1,
+        max_emitters: int = 3,
+        # Observation normalization
+        normalize_obs: bool = True,
     ):
         super().__init__()
         self.num_channels = num_channels
@@ -78,13 +98,24 @@ class SpectrumScanEnv(gym.Env):
         self.use_gnn = use_gnn and HAS_GNN
         self.render_mode = render_mode
 
-        # Observation: flattened GNN embeddings + one-hot channel position
+        # Curriculum settings
+        self.curriculum = curriculum
+        self.min_emitters = min_emitters
+        self.max_emitters = max_emitters
+        self.curriculum_episode = 0
+        self.curriculum_phase = 0  # 0=easy, 1=medium, 2=hard
+
+        # Observation normalization
+        self.normalize_obs_flag = normalize_obs
         obs_dim = num_channels * embedding_dim + num_channels
+        self.obs_stats = RunningStats(obs_dim)
+
+        # Observation space
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, shape=(obs_dim,), dtype=np.float32
         )
 
-        # Action: which channel to tune to
+        # Action space
         self.action_space = spaces.Discrete(num_channels)
 
         # Internal state
@@ -92,14 +123,14 @@ class SpectrumScanEnv(gym.Env):
         self.current_channel: int = 0
         self.step_count: int = 0
 
-        # GNN model (shared across episodes)
+        # GNN model
         if self.use_gnn:
             self.gnn_model = GNNEmbedder()
             self.gnn_model.eval()
         else:
             self.gnn_model = None
 
-        # Per-channel statistics for node features
+        # Per-channel statistics
         self._channel_visit_counts = np.zeros(num_channels, dtype=np.float64)
         self._channel_hit_counts = np.zeros(num_channels, dtype=np.float64)
         self._channel_last_visit = np.zeros(num_channels, dtype=np.float64)
@@ -111,6 +142,21 @@ class SpectrumScanEnv(gym.Env):
         self.total_active: int = 0
         self.total_false_alarms: int = 0
         self.episode_reward: float = 0.0
+        self._consecutive_misses: int = 0
+        self._last_hit_step: int = 0
+
+    def _get_curriculum_emitters(self) -> int:
+        """Determine emitter count based on curriculum phase."""
+        if not self.curriculum:
+            return self.num_emitters
+
+        # Phase transitions: easy → medium → hard
+        if self.curriculum_episode < 50:
+            return self.min_emitters
+        elif self.curriculum_episode < 150:
+            return min(self.min_emitters + 1, self.max_emitters)
+        else:
+            return self.max_emitters
 
     def reset(
         self, seed: Optional[int] = None, options: Optional[Dict] = None
@@ -118,9 +164,13 @@ class SpectrumScanEnv(gym.Env):
         """Reset the environment for a new episode."""
         super().reset(seed=seed)
 
+        # Curriculum: update emitter count
+        n_emitters = self._get_curriculum_emitters()
+        self.curriculum_episode += 1
+
         self.simulator = RFSimulator(
             num_channels=self.num_channels,
-            num_emitters=self.num_emitters,
+            num_emitters=n_emitters,
             seed=seed,
         )
         self.current_channel = self.np_random.integers(0, self.num_channels)
@@ -137,24 +187,23 @@ class SpectrumScanEnv(gym.Env):
         self.total_active = 0
         self.total_false_alarms = 0
         self.episode_reward = 0.0
+        self._consecutive_misses = 0
+        self._last_hit_step = 0
 
-        # Generate initial observation
         obs = self._get_observation()
         info = self._get_info()
 
         return obs, info
 
     def step(self, action: int) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
-        """
-        Execute one step: tune to `action` channel, advance simulator, compute reward.
-        """
+        """Execute one step with enhanced shaped reward."""
         assert self.action_space.contains(action), f"Invalid action {action}"
 
         prev_channel = self.current_channel
         self.current_channel = action
         self.step_count += 1
 
-        # Advance the RF simulator
+        # Advance RF simulator
         channel_powers, active_channels = self.simulator.step()
         self._latest_powers = channel_powers
 
@@ -168,37 +217,28 @@ class SpectrumScanEnv(gym.Env):
         if is_hit:
             self.total_hits += 1
             self._channel_hit_counts[action] += 1
+            self._consecutive_misses = 0
+            self._last_hit_step = self.step_count
+        else:
+            self._consecutive_misses += 1
 
         # Count missed active channels
         missed = [ch for ch in active_channels if ch != action]
         self.total_misses += len(missed)
         self.total_active += len(active_channels)
 
-        # ── Compute Reward ──
-        reward = 0.0
-
-        # Intercept hit
-        if is_hit:
-            reward += REWARD_INTERCEPT_HIT
-
-        # Empty scan (tuned to noise)
-        if not is_hit:
-            reward += REWARD_EMPTY_SCAN
-
-        # Missed active channels
-        reward += REWARD_MISSED_ACTIVE * len(missed)
-
-        # Switching penalty
-        switching_cost = SWITCHING_PENALTY_ALPHA * abs(action - prev_channel)
-        reward -= switching_cost
+        # ── Enhanced Shaped Reward ──
+        reward = self._compute_shaped_reward(
+            action, prev_channel, is_hit, active_channels, missed, channel_powers
+        )
 
         self.episode_reward += reward
 
-        # ── Episode Termination ──
+        # Episode termination
         terminated = False
         truncated = self.step_count >= self.episode_length
 
-        # Generate next observation
+        # Observation
         obs = self._get_observation()
         info = self._get_info()
         info["is_hit"] = is_hit
@@ -207,17 +247,60 @@ class SpectrumScanEnv(gym.Env):
 
         return obs, reward, terminated, truncated, info
 
+    def _compute_shaped_reward(
+        self, action, prev_channel, is_hit, active_channels, missed, channel_powers
+    ) -> float:
+        """
+        Enhanced multi-component shaped reward function.
+
+        Components:
+        1. Intercept hit/miss base reward
+        2. Proximity bonus for near-hits
+        3. Exploration bonus for visiting unvisited channels
+        4. Switching penalty
+        5. Consecutive miss penalty (escalating)
+        """
+        reward = 0.0
+
+        # 1. Base intercept reward
+        if is_hit:
+            reward += REWARD_INTERCEPT_HIT
+        else:
+            reward += REWARD_EMPTY_SCAN
+
+        # 2. Proximity bonus: partial reward for being close to active channel
+        if not is_hit and len(active_channels) > 0:
+            min_dist = min(abs(action - ch) for ch in active_channels)
+            if min_dist == 1:
+                reward += 2.0   # Adjacent to active — good signal
+            elif min_dist == 2:
+                reward += 0.5   # Two away — warm
+
+        # 3. Missed active channels penalty
+        reward += REWARD_MISSED_ACTIVE * len(missed)
+
+        # 4. Switching penalty (proportional to distance)
+        switching_cost = SWITCHING_PENALTY_ALPHA * abs(action - prev_channel)
+        reward -= switching_cost
+
+        # 5. Exploration bonus: reward visiting least-visited channels
+        total_visits = max(self.step_count, 1)
+        visit_ratio = self._channel_visit_counts[action] / total_visits
+        if visit_ratio < 1.0 / self.num_channels:
+            reward += 0.3  # Bonus for exploring under-visited channels
+
+        # 6. Escalating penalty for consecutive misses
+        if self._consecutive_misses > 5:
+            reward -= 0.5 * (self._consecutive_misses - 5)
+
+        return reward
+
     def _get_observation(self) -> np.ndarray:
-        """
-        Build observation vector:
-        [flattened GNN embeddings (N*32)] + [one-hot current channel (N)]
-        """
-        # Build node features [N, 4]
+        """Build observation vector with optional normalization."""
         node_features = self._build_node_features()
 
         # Get GNN embeddings
         if self.use_gnn and self.gnn_model is not None:
-            # Build graph and run GNN
             observed_transitions = None
             if self.simulator is not None:
                 observed_transitions = self.simulator.get_all_observed_transitions()
@@ -225,14 +308,12 @@ class SpectrumScanEnv(gym.Env):
             graph = build_graph(node_features, self.num_channels, observed_transitions)
 
             with torch.no_grad():
-                embeddings = self.gnn_model(graph)  # [N, 32]
+                embeddings = self.gnn_model(graph)
                 embeddings_flat = embeddings.cpu().numpy().flatten()
         else:
-            # Fallback: use raw node features padded to embedding_dim
             embeddings_flat = np.zeros(
                 self.num_channels * self.embedding_dim, dtype=np.float32
             )
-            # Place node features in first 4 dims of each channel's embedding
             for i in range(self.num_channels):
                 start = i * self.embedding_dim
                 embeddings_flat[start:start + 4] = node_features[i]
@@ -242,6 +323,13 @@ class SpectrumScanEnv(gym.Env):
         one_hot[self.current_channel] = 1.0
 
         obs = np.concatenate([embeddings_flat, one_hot]).astype(np.float32)
+
+        # Normalize observation
+        if self.normalize_obs_flag:
+            self.obs_stats.update(obs)
+            if self.obs_stats.n > 100:
+                obs = self.obs_stats.normalize(obs).astype(np.float32)
+
         return obs
 
     def _build_node_features(self) -> np.ndarray:
@@ -249,11 +337,11 @@ class SpectrumScanEnv(gym.Env):
         features = np.zeros((self.num_channels, 4), dtype=np.float32)
 
         for i in range(self.num_channels):
-            # RSSI normalized to [0, 1]
+            # RSSI normalized
             rssi_norm = (self._latest_powers[i] - (-90.0)) / 80.0
             features[i, 0] = np.clip(rssi_norm, 0.0, 1.0)
 
-            # Dwell time since last visit (normalized, capped at episode_length)
+            # Dwell time
             if self._channel_last_visit[i] > 0:
                 dwell = min(self.step_count - self._channel_last_visit[i], 100.0) / 100.0
             else:
@@ -283,7 +371,8 @@ class SpectrumScanEnv(gym.Env):
             "total_hits": self.total_hits,
             "total_misses": self.total_misses,
             "episode_reward": round(self.episode_reward, 2),
-            "epsilon": 0.0,  # Filled by agent
+            "epsilon": 0.0,
+            "curriculum_phase": self.curriculum_episode,
         }
 
     def render(self):

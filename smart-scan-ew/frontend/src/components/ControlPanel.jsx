@@ -1,8 +1,8 @@
 /**
- * Smart Scan EW — Control Panel
- * ===============================
- * Scan controls: Start/Stop, mode toggle, channel count selector,
- * and WebSocket connection status indicator.
+ * Smart Scan EW — Control Panel (Enhanced)
+ * ==========================================
+ * Polished scan controls with animated buttons,
+ * toggle switches, and smooth state transitions.
  */
 
 import React, { useState, useCallback } from 'react';
@@ -106,13 +106,13 @@ export default function ControlPanel({ isConnected, isRunning }) {
         {/* Mode Toggle */}
         <div>
           <label className="stat-label block mb-2">Scan Mode</label>
-          <div className="flex rounded-lg overflow-hidden border border-surface-600/30">
+          <div className="flex rounded-xl overflow-hidden border border-surface-600/30">
             <button
               id="btn-mode-synthetic"
               onClick={() => handleModeChange('synthetic')}
-              className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200
+              className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200
                 ${mode === 'synthetic'
-                  ? 'bg-tactical-600/30 text-tactical-400 border-r border-tactical-500/30'
+                  ? 'bg-tactical-600/20 text-tactical-400 border-r border-tactical-500/30'
                   : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30 border-r border-surface-600/30'
                 }`}
             >
@@ -121,9 +121,9 @@ export default function ControlPanel({ isConnected, isRunning }) {
             <button
               id="btn-mode-hardware"
               onClick={() => handleModeChange('hardware')}
-              className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200
+              className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200
                 ${mode === 'hardware'
-                  ? 'bg-radar-600/30 text-radar-400'
+                  ? 'bg-radar-600/20 text-radar-400'
                   : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30'
                 }`}
             >
@@ -139,10 +139,10 @@ export default function ControlPanel({ isConnected, isRunning }) {
             id="select-channels"
             value={channelCount}
             onChange={(e) => handleChannelChange(e.target.value)}
-            className="w-full bg-surface-700/50 border border-surface-600/30 rounded-lg px-3 py-2
+            className="w-full bg-surface-700/50 border border-surface-600/30 rounded-xl px-3 py-2.5
                        text-sm text-gray-200 font-mono
-                       focus:outline-none focus:ring-1 focus:ring-tactical-500/50
-                       appearance-none cursor-pointer"
+                       focus:outline-none focus:ring-2 focus:ring-tactical-500/30 focus:border-tactical-500/30
+                       appearance-none cursor-pointer transition-all duration-200"
           >
             <option value={8}>8 Channels (2–18 GHz)</option>
             <option value={10}>10 Channels (2–18 GHz)</option>
