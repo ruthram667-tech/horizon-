@@ -1,8 +1,9 @@
 /**
- * Smart Scan EW — Control Panel (Enhanced)
- * ==========================================
+ * Smart Scan EW — Control Panel (Warm Palette)
+ * ===============================================
  * Polished scan controls with animated buttons,
  * toggle switches, and smooth state transitions.
+ * Gold / Flame / Crimson theme.
  */
 
 import React, { useState, useCallback } from 'react';
@@ -62,7 +63,7 @@ export default function ControlPanel({ isConnected, isRunning }) {
     <div className="glass-card p-4 h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
-          <span className="text-amber-400 mr-2">◆</span>
+          <span className="text-gold-400 mr-2">◆</span>
           Scan Controls
         </h2>
         {/* Connection status */}
@@ -97,7 +98,7 @@ export default function ControlPanel({ isConnected, isRunning }) {
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
-              <span className="w-0 h-0 border-l-[10px] border-l-white border-y-[6px] border-y-transparent" />
+              <span className="w-0 h-0 border-l-[10px] border-l-black border-y-[6px] border-y-transparent" />
               START SCAN
             </span>
           )}
@@ -112,7 +113,7 @@ export default function ControlPanel({ isConnected, isRunning }) {
               onClick={() => handleModeChange('synthetic')}
               className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200
                 ${mode === 'synthetic'
-                  ? 'bg-tactical-600/20 text-tactical-400 border-r border-tactical-500/30'
+                  ? 'bg-gold-600/20 text-gold-400 border-r border-gold-500/30'
                   : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30 border-r border-surface-600/30'
                 }`}
             >
@@ -123,7 +124,7 @@ export default function ControlPanel({ isConnected, isRunning }) {
               onClick={() => handleModeChange('hardware')}
               className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200
                 ${mode === 'hardware'
-                  ? 'bg-radar-600/20 text-radar-400'
+                  ? 'bg-flame-600/20 text-flame-400'
                   : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30'
                 }`}
             >
@@ -141,7 +142,7 @@ export default function ControlPanel({ isConnected, isRunning }) {
             onChange={(e) => handleChannelChange(e.target.value)}
             className="w-full bg-surface-700/50 border border-surface-600/30 rounded-xl px-3 py-2.5
                        text-sm text-gray-200 font-mono
-                       focus:outline-none focus:ring-2 focus:ring-tactical-500/30 focus:border-tactical-500/30
+                       focus:outline-none focus:ring-2 focus:ring-gold-500/30 focus:border-gold-500/30
                        appearance-none cursor-pointer transition-all duration-200"
           >
             <option value={8}>8 Channels (2–18 GHz)</option>
@@ -163,12 +164,12 @@ export default function ControlPanel({ isConnected, isRunning }) {
               <span className="text-gray-300 font-mono">DQN + GAT</span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className="text-gray-500">Update Rate</span>
-              <span className="text-gray-300 font-mono">30 FPS</span>
+              <span className="text-gray-500">Scan Speed</span>
+              <span className="text-gold-400 font-mono">~2 FPS</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-gray-500">Mode</span>
-              <span className={`font-mono ${mode === 'synthetic' ? 'text-tactical-400' : 'text-radar-400'}`}>
+              <span className={`font-mono ${mode === 'synthetic' ? 'text-gold-400' : 'text-flame-400'}`}>
                 {mode.toUpperCase()}
               </span>
             </div>

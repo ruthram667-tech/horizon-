@@ -1,8 +1,9 @@
 /**
- * Smart Scan EW — Navbar
- * =======================
+ * Smart Scan EW — Navbar (Warm Tactical)
+ * ========================================
  * Premium persistent navigation bar with brand, page links,
  * scan status, and WebSocket connection indicator.
+ * Colors: Gold / Flame / Crimson palette.
  */
 
 import React from 'react';
@@ -17,8 +18,8 @@ export default function Navbar({ isConnected, isRunning, connectionStatus }) {
       <div className="max-w-[1920px] mx-auto px-6 py-3 flex items-center justify-between">
         {/* ── Brand ── */}
         <NavLink to="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-tactical-500 to-radar-500 flex items-center justify-center shadow-lg group-hover:shadow-tactical-500/20 transition-shadow duration-300">
-            <span className="text-white font-bold text-base">⚡</span>
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gold-400 to-flame-400 flex items-center justify-center shadow-lg group-hover:shadow-gold-400/20 transition-shadow duration-300">
+            <span className="text-black font-bold text-base">⚡</span>
           </div>
           <div className="flex flex-col">
             <h1 className="text-sm font-bold tracking-tight text-white leading-tight">
@@ -77,12 +78,12 @@ export default function Navbar({ isConnected, isRunning, connectionStatus }) {
               {/* Scan Status Badge */}
               <div className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider border transition-all duration-300
                 ${isRunning
-                  ? 'bg-tactical-500/10 border-tactical-500/30 text-tactical-400'
+                  ? 'bg-gold-400/10 border-gold-400/30 text-gold-400'
                   : 'bg-surface-700/50 border-surface-600/30 text-gray-500'
                 }`}
               >
                 <span className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-tactical-400 animate-pulse' : 'bg-gray-600'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-gold-400 animate-pulse' : 'bg-gray-600'}`} />
                   {isRunning ? 'Scanning' : 'Idle'}
                 </span>
               </div>

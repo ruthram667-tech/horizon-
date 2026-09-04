@@ -1,14 +1,14 @@
 /**
- * Smart Scan EW — Analytics Page
- * ================================
+ * Smart Scan EW — Analytics Page (Warm Palette)
+ * ================================================
  * Historical metrics, session trends, and RL agent performance.
- * Shows accumulated data from the current and previous scan sessions.
+ * Gold / Flame / Crimson theme — no blue or purple.
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /* ─── Ring Gauge Component ─── */
-function RingGauge({ value, max = 1, size = 120, strokeWidth = 8, color = '#00e693', label, sublabel }) {
+function RingGauge({ value, max = 1, size = 120, strokeWidth = 8, color = '#FFB800', label, sublabel }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = Math.min(value / max, 1);
@@ -44,7 +44,7 @@ function RingGauge({ value, max = 1, size = 120, strokeWidth = 8, color = '#00e6
 }
 
 /* ─── Sparkline Chart ─── */
-function SparklineChart({ values, color = '#00e693', width = 200, height = 60, label }) {
+function SparklineChart({ values, color = '#FFB800', width = 200, height = 60, label }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -158,13 +158,13 @@ export default function AnalyticsPage({ data }) {
         {/* Ring Gauges */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <div className="glass-card p-6 flex items-center justify-center">
-            <RingGauge value={pd} color="#00e693" label="Detection Prob" sublabel="Pd" />
+            <RingGauge value={pd} color="#FFB800" label="Detection Prob" sublabel="Pd" />
           </div>
           <div className="glass-card p-6 flex items-center justify-center">
-            <RingGauge value={1 - pfa} color="#0073e6" label="Accuracy" sublabel="1 - Pfa" />
+            <RingGauge value={1 - pfa} color="#FF6B35" label="Accuracy" sublabel="1 - Pfa" />
           </div>
           <div className="glass-card p-6 flex items-center justify-center">
-            <RingGauge value={efficiency} color="#a855f7" label="Efficiency" sublabel="Hits / Scans" />
+            <RingGauge value={efficiency} color="#DC2626" label="Efficiency" sublabel="Hits / Scans" />
           </div>
           <div className="glass-card p-6 flex items-center justify-center">
             <RingGauge value={Math.min(1, Math.max(0, episodeReward / 500))} color="#f59e0b" label="Reward" sublabel={`${episodeReward.toFixed(0)} pts`} />
@@ -175,10 +175,10 @@ export default function AnalyticsPage({ data }) {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
             { label: 'Total Scans', value: totalHops.toLocaleString(), color: 'text-white' },
-            { label: 'Total Hits', value: totalHits.toLocaleString(), color: 'text-tactical-400' },
-            { label: 'Total Misses', value: totalMisses.toLocaleString(), color: 'text-red-400' },
-            { label: 'False Alarm', value: `${(pfa * 100).toFixed(2)}%`, color: 'text-amber-400' },
-            { label: 'Cumul. Reward', value: episodeReward.toFixed(0), color: 'text-purple-400' },
+            { label: 'Total Hits', value: totalHits.toLocaleString(), color: 'text-gold-400' },
+            { label: 'Total Misses', value: totalMisses.toLocaleString(), color: 'text-crimson-400' },
+            { label: 'False Alarm', value: `${(pfa * 100).toFixed(2)}%`, color: 'text-flame-400' },
+            { label: 'Cumul. Reward', value: episodeReward.toFixed(0), color: 'text-amber-400' },
           ].map((stat) => (
             <div key={stat.label} className="glass-card p-4 text-center">
               <div className={`text-2xl font-bold font-mono ${stat.color}`}>{stat.value}</div>
@@ -191,9 +191,9 @@ export default function AnalyticsPage({ data }) {
         <div className="grid md:grid-cols-2 gap-6">
           <div className="glass-card p-6">
             <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-tactical-400 mr-2">◆</span>Detection Probability Over Time
+              <span className="text-gold-400 mr-2">◆</span>Detection Probability Over Time
             </h3>
-            <SparklineChart values={pdHistory.length > 1 ? pdHistory : [0, 0]} color="#00e693" width={500} height={100} />
+            <SparklineChart values={pdHistory.length > 1 ? pdHistory : [0, 0]} color="#FFB800" width={500} height={100} />
             <div className="flex justify-between mt-3 text-xs text-gray-500 font-mono">
               <span>Start</span>
               <span>Current: {(pd * 100).toFixed(1)}%</span>
@@ -202,9 +202,9 @@ export default function AnalyticsPage({ data }) {
 
           <div className="glass-card p-6">
             <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-amber-400 mr-2">◆</span>False Alarm Rate Over Time
+              <span className="text-flame-400 mr-2">◆</span>False Alarm Rate Over Time
             </h3>
-            <SparklineChart values={pfaHistory.length > 1 ? pfaHistory : [0, 0]} color="#f59e0b" width={500} height={100} />
+            <SparklineChart values={pfaHistory.length > 1 ? pfaHistory : [0, 0]} color="#FF6B35" width={500} height={100} />
             <div className="flex justify-between mt-3 text-xs text-gray-500 font-mono">
               <span>Start</span>
               <span>Current: {(pfa * 100).toFixed(2)}%</span>
@@ -213,9 +213,9 @@ export default function AnalyticsPage({ data }) {
 
           <div className="glass-card p-6">
             <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-radar-400 mr-2">◆</span>Cumulative Hits
+              <span className="text-amber-400 mr-2">◆</span>Cumulative Hits
             </h3>
-            <SparklineChart values={hitsHistory.length > 1 ? hitsHistory : [0, 0]} color="#0073e6" width={500} height={100} />
+            <SparklineChart values={hitsHistory.length > 1 ? hitsHistory : [0, 0]} color="#f59e0b" width={500} height={100} />
             <div className="flex justify-between mt-3 text-xs text-gray-500 font-mono">
               <span>Start</span>
               <span>Total: {totalHits}</span>
@@ -224,9 +224,9 @@ export default function AnalyticsPage({ data }) {
 
           <div className="glass-card p-6">
             <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-purple-400 mr-2">◆</span>Episode Reward
+              <span className="text-crimson-400 mr-2">◆</span>Episode Reward
             </h3>
-            <SparklineChart values={rewardHistory.length > 1 ? rewardHistory : [0, 0]} color="#a855f7" width={500} height={100} />
+            <SparklineChart values={rewardHistory.length > 1 ? rewardHistory : [0, 0]} color="#DC2626" width={500} height={100} />
             <div className="flex justify-between mt-3 text-xs text-gray-500 font-mono">
               <span>Start</span>
               <span>Current: {episodeReward.toFixed(0)}</span>

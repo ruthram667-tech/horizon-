@@ -1,8 +1,9 @@
 /**
- * Smart Scan EW — WebSocket Hook
- * ================================
+ * Smart Scan EW — WebSocket Hook (Slow Scan Mode)
+ * ==================================================
  * High-performance WebSocket consumer with auto-reconnect,
- * exponential backoff, and 30 FPS render-capped state updates.
+ * exponential backoff, and THROTTLED state updates (~2 FPS)
+ * with smooth interpolation between frames for cinematic scanning.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -10,6 +11,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 const WS_URL = `ws://${window.location.hostname}:8000/ws/stream`;
 const MAX_RECONNECT_DELAY = 8000;
 const INITIAL_RECONNECT_DELAY = 1000;
+
+// Slow scan: update the UI every ~500ms (2 FPS) instead of every frame
+const DISPLAY_INTERVAL_MS = 500;
+
+function lerpArray(prev, next, t) {
+  if (!prev || !next || prev.length !== next.length) return next;
+  return prev.map((v, i) => v + (next[i] - v) * t);
+}
 
 export default function useWebSocket() {
   const [data, setData] = useState(null);
@@ -19,17 +28,46 @@ export default function useWebSocket() {
   const wsRef = useRef(null);
   const reconnectDelay = useRef(INITIAL_RECONNECT_DELAY);
   const reconnectTimer = useRef(null);
-  const latestData = useRef(null);
+  const latestRawData = useRef(null);
+  const displayedData = useRef(null);
+  const lastUpdateTime = useRef(0);
   const rafId = useRef(null);
   const mountedRef = useRef(true);
 
-  // Render loop: cap state updates to requestAnimationFrame rate
+  // Throttled render loop with interpolation
   const startRenderLoop = useCallback(() => {
-    const render = () => {
+    const render = (timestamp) => {
       if (!mountedRef.current) return;
-      if (latestData.current !== null) {
-        setData({ ...latestData.current });
+
+      if (latestRawData.current !== null) {
+        const now = performance.now();
+        const elapsed = now - lastUpdateTime.current;
+
+        if (elapsed >= DISPLAY_INTERVAL_MS) {
+          // Time to push a new display frame
+          const raw = latestRawData.current;
+
+          if (displayedData.current && displayedData.current.channel_powers && raw.channel_powers) {
+            // Smooth interpolation of power values
+            const interpolated = {
+              ...raw,
+              channel_powers: lerpArray(
+                displayedData.current.channel_powers,
+                raw.channel_powers,
+                0.6 // Blend factor: 60% toward new data for smooth transition
+              ),
+            };
+            displayedData.current = interpolated;
+            setData({ ...interpolated });
+          } else {
+            displayedData.current = raw;
+            setData({ ...raw });
+          }
+
+          lastUpdateTime.current = now;
+        }
       }
+
       rafId.current = requestAnimationFrame(render);
     };
     rafId.current = requestAnimationFrame(render);
@@ -55,7 +93,7 @@ export default function useWebSocket() {
       ws.onmessage = (event) => {
         try {
           const parsed = JSON.parse(event.data);
-          latestData.current = parsed;
+          latestRawData.current = parsed;
         } catch (e) {
           console.warn('[WS] Parse error:', e);
         }

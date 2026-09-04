@@ -1,8 +1,9 @@
 /**
- * Smart Scan EW — Landing Page
- * ==============================
+ * Smart Scan EW — Landing Page (Warm Palette)
+ * ==============================================
  * Premium hero section with animated background, features showcase,
  * architecture overview, and CTA to launch the dashboard.
+ * Colors: Gold / Flame / Crimson — No blue or purple.
  */
 
 import React from 'react';
@@ -15,7 +16,7 @@ const FEATURES = [
     title: 'Graph Neural Network',
     subtitle: '2-Layer GAT Architecture',
     description: 'Models frequency channels as a graph with spectral adjacency and observed hop transitions. 4-head attention produces rich 32-dim node embeddings.',
-    color: 'tactical',
+    color: 'gold',
     stats: '4→128→32',
   },
   {
@@ -23,7 +24,7 @@ const FEATURES = [
     title: 'Deep Q-Network',
     subtitle: 'Reinforcement Learning Agent',
     description: 'Double DQN with experience replay learns optimal tuning strategies. Adapts in real-time to evolving FHSS patterns without prior intelligence.',
-    color: 'radar',
+    color: 'flame',
     stats: 'ε-greedy',
   },
   {
@@ -37,34 +38,34 @@ const FEATURES = [
   {
     icon: '⚡',
     title: 'Real-Time Streaming',
-    subtitle: '30 FPS WebSocket Feed',
-    description: 'High-performance FastAPI backend streams live telemetry via WebSocket at 30 FPS with canvas-rendered waterfall spectrogram.',
-    color: 'purple',
-    stats: '30 FPS',
+    subtitle: 'Slow Scan Visualization',
+    description: 'High-performance FastAPI backend streams live telemetry via WebSocket with canvas-rendered waterfall spectrogram and GNN graph visualization.',
+    color: 'crimson',
+    stats: '~2 FPS',
   },
 ];
 
 const ARCH_NODES = [
   { id: 'rf', label: 'RF Simulator', sub: 'FHSS / AWGN', icon: '📻', color: 'amber' },
-  { id: 'gnn', label: 'GNN Embedder', sub: '2-Layer GAT', icon: '🧠', color: 'tactical' },
-  { id: 'rl', label: 'RL Agent', sub: 'Double DQN', icon: '🎯', color: 'radar' },
-  { id: 'api', label: 'FastAPI + WS', sub: 'REST + Stream', icon: '🔌', color: 'purple' },
-  { id: 'ui', label: 'React Dashboard', sub: 'Canvas + Glass', icon: '🖥️', color: 'tactical' },
+  { id: 'gnn', label: 'GNN Embedder', sub: '2-Layer GAT', icon: '🧠', color: 'gold' },
+  { id: 'rl', label: 'RL Agent', sub: 'Double DQN', icon: '🎯', color: 'flame' },
+  { id: 'api', label: 'FastAPI + WS', sub: 'REST + Stream', icon: '🔌', color: 'crimson' },
+  { id: 'ui', label: 'React Dashboard', sub: 'Canvas + Glass', icon: '🖥️', color: 'gold' },
 ];
 
 const TEAM_STATS = [
   { value: '12', label: 'Channels' },
-  { value: '30', label: 'FPS' },
+  { value: '~2', label: 'FPS' },
   { value: '10+', label: 'Reward Hit' },
   { value: '<50ms', label: 'Latency' },
 ];
 
 function FeatureCard({ feature, index }) {
   const colorMap = {
-    tactical: { border: 'hover:border-tactical-500/30', glow: 'rgba(0,230,147,0.15)', text: 'text-tactical-400', bg: 'bg-tactical-500/10' },
-    radar: { border: 'hover:border-radar-500/30', glow: 'rgba(0,115,230,0.15)', text: 'text-radar-400', bg: 'bg-radar-500/10' },
-    amber: { border: 'hover:border-amber-500/30', glow: 'rgba(251,191,36,0.15)', text: 'text-amber-400', bg: 'bg-amber-400/10' },
-    purple: { border: 'hover:border-purple-500/30', glow: 'rgba(168,85,247,0.15)', text: 'text-purple-400', bg: 'bg-purple-500/10' },
+    gold: { border: 'hover:border-gold-400/30', glow: 'rgba(255,184,0,0.15)', text: 'text-gold-400', bg: 'bg-gold-400/10' },
+    flame: { border: 'hover:border-flame-400/30', glow: 'rgba(255,107,53,0.15)', text: 'text-flame-400', bg: 'bg-flame-400/10' },
+    amber: { border: 'hover:border-amber-400/30', glow: 'rgba(251,191,36,0.15)', text: 'text-amber-400', bg: 'bg-amber-400/10' },
+    crimson: { border: 'hover:border-crimson-400/30', glow: 'rgba(220,38,38,0.15)', text: 'text-crimson-400', bg: 'bg-crimson-500/10' },
   };
   const c = colorMap[feature.color];
 
@@ -96,7 +97,7 @@ function ArchitectureSection() {
     <section className="py-20 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 animate-fade-in-up">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-tactical-400 mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold-400 mb-3">
             System Architecture
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -104,7 +105,7 @@ function ArchitectureSection() {
           </h2>
           <p className="text-gray-400 max-w-xl mx-auto">
             From raw RF simulation through GNN feature extraction to RL-driven tuning decisions,
-            streamed live to the browser at 30 FPS.
+            streamed live to the browser with cinematic slow-scan visualization.
           </p>
         </div>
 
@@ -112,10 +113,10 @@ function ArchitectureSection() {
         <div className="flex flex-wrap justify-center items-center gap-4 md:gap-2">
           {ARCH_NODES.map((node, i) => {
             const colorMap = {
-              tactical: 'border-tactical-500/30 hover:border-tactical-500/50',
-              radar: 'border-radar-500/30 hover:border-radar-500/50',
+              gold: 'border-gold-400/30 hover:border-gold-400/50',
+              flame: 'border-flame-400/30 hover:border-flame-400/50',
               amber: 'border-amber-400/30 hover:border-amber-400/50',
-              purple: 'border-purple-500/30 hover:border-purple-500/50',
+              crimson: 'border-crimson-400/30 hover:border-crimson-400/50',
             };
             return (
               <React.Fragment key={node.id}>
@@ -125,7 +126,7 @@ function ArchitectureSection() {
                   <div className="text-[10px] text-gray-500 font-mono uppercase tracking-wider mt-1">{node.sub}</div>
                 </div>
                 {i < ARCH_NODES.length - 1 && (
-                  <div className="text-tactical-500/60 text-lg font-mono hidden md:block">→</div>
+                  <div className="text-gold-400/60 text-lg font-mono hidden md:block">→</div>
                 )}
               </React.Fragment>
             );
@@ -141,15 +142,15 @@ export default function LandingPage() {
     <div className="min-h-screen">
       {/* ── Hero Section ── */}
       <section className="hero-gradient grid-pattern relative min-h-[85vh] flex items-center justify-center px-6">
-        {/* Floating orbs */}
-        <div className="floating-orb w-96 h-96 bg-tactical-500/10 top-20 -left-48" />
-        <div className="floating-orb w-72 h-72 bg-radar-500/10 bottom-20 -right-36" style={{ animationDelay: '5s' }} />
-        <div className="floating-orb w-48 h-48 bg-purple-500/8 top-1/2 left-1/3" style={{ animationDelay: '10s' }} />
+        {/* Floating orbs — warm palette */}
+        <div className="floating-orb w-96 h-96 bg-gold-400/10 top-20 -left-48" />
+        <div className="floating-orb w-72 h-72 bg-flame-400/10 bottom-20 -right-36" style={{ animationDelay: '5s' }} />
+        <div className="floating-orb w-48 h-48 bg-crimson-500/8 top-1/2 left-1/3" style={{ animationDelay: '10s' }} />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-surface-500/40 bg-surface-800/40 backdrop-blur-sm mb-8 animate-fade-in-up stagger-1">
-            <span className="w-2 h-2 rounded-full bg-tactical-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse" />
             <span className="text-xs font-medium text-gray-300 uppercase tracking-wider">
               Smart Innovation Hackathon 2026 • SIH26055
             </span>
@@ -198,7 +199,7 @@ export default function LandingPage() {
       <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 animate-fade-in-up">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-radar-400 mb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-flame-400 mb-3">
               Core Capabilities
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -245,30 +246,30 @@ export default function LandingPage() {
               <tbody>
                 <tr className="border-b border-surface-600/10 hover:bg-surface-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-tactical-400" /> Intercept Hit
+                    <span className="w-2 h-2 rounded-full bg-gold-400" /> Intercept Hit
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-tactical-400 font-bold">+10.0</td>
+                  <td className="px-6 py-4 text-right font-mono text-gold-400 font-bold">+10.0</td>
                   <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Tuned to active emitter channel</td>
                 </tr>
                 <tr className="border-b border-surface-600/10 hover:bg-surface-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-gray-500" /> Empty Scan
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-red-400 font-bold">−1.0</td>
+                  <td className="px-6 py-4 text-right font-mono text-crimson-400 font-bold">−1.0</td>
                   <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Tuned to noise/inactive channel</td>
                 </tr>
                 <tr className="border-b border-surface-600/10 hover:bg-surface-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500" /> Missed Active
+                    <span className="w-2 h-2 rounded-full bg-crimson-500" /> Missed Active
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-red-400 font-bold">−5.0</td>
+                  <td className="px-6 py-4 text-right font-mono text-crimson-400 font-bold">−5.0</td>
                   <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Per missed active channel</td>
                 </tr>
                 <tr className="hover:bg-surface-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-400" /> Switching Cost
+                    <span className="w-2 h-2 rounded-full bg-flame-400" /> Switching Cost
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-amber-400 font-bold">−0.3·|Δf|</td>
+                  <td className="px-6 py-4 text-right font-mono text-flame-400 font-bold">−0.3·|Δf|</td>
                   <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Tuning delay proportional to frequency distance</td>
                 </tr>
               </tbody>
@@ -302,8 +303,8 @@ export default function LandingPage() {
       <footer className="border-t border-surface-600/20 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-tactical-500 to-radar-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xs">⚡</span>
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-gold-400 to-flame-400 flex items-center justify-center">
+              <span className="text-black font-bold text-xs">⚡</span>
             </div>
             <span className="text-sm text-gray-500">
               Team HORIZON — Smart Innovation Hackathon 2026

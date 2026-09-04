@@ -1,15 +1,18 @@
 /**
- * Smart Scan EW — Dashboard Page
- * ================================
- * Full tactical dashboard with waterfall spectrogram, metrics panel,
- * control panel, and spectrum analyzer. Refactored from original App.jsx
- * into a dedicated routed page with improved layout and design.
+ * Smart Scan EW — Dashboard Page (Restructured)
+ * ================================================
+ * Full tactical dashboard with GNN Visualizer, waterfall spectrogram,
+ * metrics panel, control panel, and spectrum analyzer.
+ * Layout restructured to showcase GNN processing alongside scanning.
+ *
+ * Team HORIZON — SIH26055
  */
 
 import React, { useRef, useEffect, useCallback } from 'react';
 import WaterfallPlot from '../components/WaterfallPlot';
 import MetricsPanel from '../components/MetricsPanel';
 import ControlPanel from '../components/ControlPanel';
+import GNNVisualizer from '../components/GNNVisualizer';
 
 // ─────────────────────────────────────────────
 // Spectrum Analyzer Bar Chart (Canvas-based)
@@ -56,7 +59,7 @@ function SpectrumAnalyzer({ data }) {
       smoothedRef.current = [...powers];
     }
     for (let i = 0; i < numCh; i++) {
-      smoothedRef.current[i] += (powers[i] - smoothedRef.current[i]) * 0.3;
+      smoothedRef.current[i] += (powers[i] - smoothedRef.current[i]) * 0.15; // Slower smoothing
     }
     const smoothed = smoothedRef.current;
 
@@ -89,14 +92,14 @@ function SpectrumAnalyzer({ data }) {
 
     // Detection threshold line
     const threshY = padding.top + plotH - ((-50 - minPower) / range) * plotH;
-    ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
+    ctx.strokeStyle = 'rgba(255, 184, 0, 0.35)';
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
     ctx.moveTo(padding.left, threshY);
     ctx.lineTo(w - padding.right, threshY);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(251, 191, 36, 0.5)';
+    ctx.fillStyle = 'rgba(255, 184, 0, 0.5)';
     ctx.textAlign = 'left';
     ctx.fillText('Threshold', w - padding.right - 55, threshY - 4);
 
@@ -107,19 +110,19 @@ function SpectrumAnalyzer({ data }) {
       const x = padding.left + i * (plotW / numCh) + barGap / 2;
       const y = padding.top + plotH - barH;
 
-      // Bar color based on state
+      // Bar color based on state — warm palette
       let color, glowColor;
       if (i === tunedCh && isHit) {
-        color = 'rgba(34, 197, 94, 0.9)';
+        color = 'rgba(34, 197, 94, 0.9)';      // Green for hit
         glowColor = 'rgba(34, 197, 94, 0.3)';
       } else if (i === tunedCh) {
-        color = 'rgba(0, 115, 230, 0.9)';
-        glowColor = 'rgba(0, 115, 230, 0.3)';
+        color = 'rgba(255, 184, 0, 0.9)';       // Gold for tuned
+        glowColor = 'rgba(255, 184, 0, 0.3)';
       } else if (activeChs.has(i)) {
-        color = 'rgba(239, 68, 68, 0.9)';
-        glowColor = 'rgba(239, 68, 68, 0.3)';
+        color = 'rgba(220, 38, 38, 0.9)';       // Crimson for active target
+        glowColor = 'rgba(220, 38, 38, 0.3)';
       } else {
-        color = 'rgba(100, 120, 160, 0.45)';
+        color = 'rgba(120, 110, 100, 0.45)';    // Warm gray for idle
         glowColor = null;
       }
 
@@ -136,15 +139,15 @@ function SpectrumAnalyzer({ data }) {
       ctx.fillStyle = gradient;
 
       // Rounded top rect
-      const radius = Math.min(barWidth / 2, 4);
+      const bRadius = Math.min(barWidth / 2, 4);
       ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + barWidth - radius, y);
-      ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + radius);
+      ctx.moveTo(x + bRadius, y);
+      ctx.lineTo(x + barWidth - bRadius, y);
+      ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + bRadius);
       ctx.lineTo(x + barWidth, padding.top + plotH);
       ctx.lineTo(x, padding.top + plotH);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.lineTo(x, y + bRadius);
+      ctx.quadraticCurveTo(x, y, x + bRadius, y);
       ctx.fill();
 
       // Reset shadow
@@ -181,13 +184,13 @@ function SpectrumAnalyzer({ data }) {
     ctx.fillText('Power (dBm)', 0, 0);
     ctx.restore();
 
-    // Legend
+    // Legend — warm palette
     const legendX = padding.left + 10;
     const legendY = padding.top + 8;
     const items = [
       { color: 'rgba(34, 197, 94, 0.9)', label: 'Intercepted' },
-      { color: 'rgba(0, 115, 230, 0.9)', label: 'Tuned' },
-      { color: 'rgba(239, 68, 68, 0.9)', label: 'Missed' },
+      { color: 'rgba(255, 184, 0, 0.9)', label: 'Tuned' },
+      { color: 'rgba(220, 38, 38, 0.9)', label: 'Missed' },
     ];
     ctx.font = '9px Outfit, sans-serif';
     items.forEach((item, idx) => {
@@ -215,7 +218,7 @@ function SpectrumAnalyzer({ data }) {
     <div className="glass-card p-4 h-full flex flex-col">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
-          <span className="text-purple-400 mr-2">◆</span>
+          <span className="text-gold-400 mr-2">◆</span>
           Spectrum Analyzer
         </h2>
         <span className="text-xs text-gray-500 font-mono">
@@ -231,31 +234,36 @@ function SpectrumAnalyzer({ data }) {
 
 
 // ─────────────────────────────────────────────
-// Dashboard Page
+// Dashboard Page — Restructured Layout with GNN
 // ─────────────────────────────────────────────
 export default function DashboardPage({ data, isConnected, isRunning }) {
   return (
     <div className="h-[calc(100vh-57px)] flex flex-col overflow-hidden animate-fade-in">
       {/* ── Main Grid ── */}
       <div className="flex-1 grid grid-cols-12 gap-3 p-3 min-h-0">
-        {/* Left: Waterfall (7 cols) */}
-        <div className="col-span-7 min-h-0">
-          <WaterfallPlot data={data} />
-        </div>
-
-        {/* Right: Metrics + Controls (5 cols) */}
+        {/* Left: GNN Visualizer (5 cols) */}
         <div className="col-span-5 flex flex-col gap-3 min-h-0">
           <div className="flex-1 min-h-0">
-            <MetricsPanel data={data} />
+            <GNNVisualizer data={data} />
           </div>
           <div className="flex-shrink-0">
             <ControlPanel isConnected={isConnected} isRunning={isRunning} />
           </div>
         </div>
+
+        {/* Center: Waterfall (4 cols) */}
+        <div className="col-span-4 min-h-0">
+          <WaterfallPlot data={data} />
+        </div>
+
+        {/* Right: Metrics (3 cols) */}
+        <div className="col-span-3 min-h-0">
+          <MetricsPanel data={data} />
+        </div>
       </div>
 
       {/* ── Bottom: Spectrum Analyzer ── */}
-      <div className="h-[220px] px-3 pb-3 flex-shrink-0">
+      <div className="h-[200px] px-3 pb-3 flex-shrink-0">
         <SpectrumAnalyzer data={data} />
       </div>
     </div>
