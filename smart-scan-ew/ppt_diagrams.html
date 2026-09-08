@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple PPT Diagrams</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0A1A1A;
+      color: #E8F0EC;
+      font-family: 'Space Grotesk', sans-serif;
+      margin: 0; padding: 40px;
+    }
+    h1 { text-align: center; color: #2dd4a8; margin-bottom: 60px; font-size: 32px; }
+    
+    .diagram-section {
+      margin-bottom: 80px;
+      padding: 40px;
+      background: #0E2424;
+      border: 1px solid #0d4f4f;
+      border-radius: 16px;
+    }
+    .diagram-title { font-size: 24px; font-weight: 700; margin-bottom: 40px; text-align: center; color: #2dd4a8; }
+
+    /* ── Diagram 1: System Flow ── */
+    .flow-container { display: flex; justify-content: center; align-items: center; gap: 20px; }
+    .flow-box {
+      background: #122E2E; border: 2px solid #0d4f4f; border-radius: 12px;
+      padding: 20px; text-align: center; width: 180px; height: 140px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .flow-box h3 { margin: 0 0 10px 0; color: white; font-size: 16px; }
+    .flow-box p { margin: 0; color: #7a9a8e; font-size: 12px; line-height: 1.4; }
+    .flow-arrow { color: #2dd4a8; font-size: 24px; font-weight: bold; }
+
+    /* ── Diagram 2: AI Brain ── */
+    .brain-container { display: flex; justify-content: center; gap: 40px; }
+    .brain-half { border: 2px solid #0d4f4f; border-radius: 16px; padding: 30px; width: 400px; }
+    .brain-title { text-align: center; color: #2dd4a8; font-size: 20px; margin-bottom: 20px; font-weight: 700; }
+    .brain-box {
+      background: #122E2E; border: 1px solid #2dd4a8; border-radius: 8px;
+      padding: 15px; margin-bottom: 15px; text-align: center;
+    }
+    .brain-box h4 { margin: 0 0 5px 0; color: white; }
+    .brain-box p { margin: 0; color: #7a9a8e; font-size: 13px; }
+    .brain-arrow { text-align: center; color: #2dd4a8; font-size: 20px; margin-bottom: 15px; }
+
+    /* ── Diagram 3: Comparison Chart ── */
+    .comparison-container { max-width: 800px; margin: 0 auto; }
+    .comp-row { display: flex; margin-bottom: 30px; align-items: center; }
+    .comp-label { width: 250px; font-weight: 600; font-size: 16px; color: white; }
+    
+    .comp-bars { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .bar-group { display: flex; align-items: center; gap: 12px; }
+    
+    .bar { height: 28px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-weight: 600; font-size: 12px; }
+    
+    /* Traditional System (Grey/Red) */
+    .bar-old { background: #436257; color: #E8F0EC; }
+    /* Our System (Mint Green) */
+    .bar-new { background: #2dd4a8; color: #0A1A1A; box-shadow: 0 0 10px rgba(45,212,168,0.4); }
+    
+    .legend { display: flex; justify-content: center; gap: 30px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #0d4f4f; }
+    .legend-item { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .legend-box { width: 16px; height: 16px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+  <h1>Presentations Diagrams</h1>
+
+  <!-- Diagram 3: Comparison -->
+  <div class="diagram-section">
+    <div class="diagram-title">Performance Comparison: Traditional vs. Smart Scan EW</div>
+    <div class="comparison-container">
+      
+      <!-- Metric 1 -->
+      <div class="comp-row">
+        <div class="comp-label">Detection Probability<br/><span style="font-size:12px;color:#7a9a8e;font-weight:400">(Higher is better)</span></div>
+        <div class="comp-bars">
+          <div class="bar-group">
+            <div class="bar bar-old" style="width: 35%;">35%</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar bar-new" style="width: 95%;">95%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metric 2 -->
+      <div class="comp-row">
+        <div class="comp-label">False Alarm Rate<br/><span style="font-size:12px;color:#7a9a8e;font-weight:400">(Lower is better)</span></div>
+        <div class="comp-bars">
+          <div class="bar-group">
+            <div class="bar bar-old" style="width: 60%;">High (15%)</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar bar-new" style="width: 15%;">Low (1.2%)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metric 3 -->
+      <div class="comp-row">
+        <div class="comp-label">Learning & Adaptability<br/><span style="font-size:12px;color:#7a9a8e;font-weight:400">(Ability to predict enemy hops)</span></div>
+        <div class="comp-bars">
+          <div class="bar-group">
+            <div class="bar bar-old" style="width: 20%;">None (Blind Sweeping)</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar bar-new" style="width: 100%;">High (AI Pattern Prediction)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metric 4 -->
+      <div class="comp-row">
+        <div class="comp-label">System Response Time<br/><span style="font-size:12px;color:#7a9a8e;font-weight:400">(Speed to intercept)</span></div>
+        <div class="comp-bars">
+          <div class="bar-group">
+            <div class="bar bar-old" style="width: 80%;">Slow (~500ms)</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar bar-new" style="width: 25%;">Instant (~10ms)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-box" style="background: #436257;"></div>
+          <span>Existing Systems (Linear Sweep)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #2dd4a8; box-shadow: 0 0 10px rgba(45,212,168,0.4);"></div>
+          <span style="color: #2dd4a8; font-weight: 600;">Smart Scan EW (AI-Powered)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagram 4: X-Y Line Graphs (Side by Side) -->
+  <div class="diagram-section">
+    <div class="diagram-title">Performance: Traditional vs Smart Scan EW</div>
+    <div style="display: flex; gap: 20px; max-width: 1000px; margin: 0 auto;">
+      
+      <!-- Graph 1: Existing System -->
+      <div style="flex: 1; background: #0A1A1A; padding: 20px; border-radius: 12px; border: 1px solid #1a3c3c; text-align: center;">
+        <h4 style="color: #7a9a8e; margin-top: 0; font-size: 18px;">Existing System (Blind Sweeping)</h4>
+        <canvas id="chartOld" width="400" height="300"></canvas>
+      </div>
+
+      <!-- Graph 2: Smart Scan EW -->
+      <div style="flex: 1; background: #0A1A1A; padding: 20px; border-radius: 12px; border: 1px solid #2dd4a8; text-align: center; box-shadow: 0 0 20px rgba(45,212,168,0.15);">
+        <h4 style="color: #2dd4a8; margin-top: 0; font-size: 18px;">Smart Scan EW (AI Learning)</h4>
+        <canvas id="chartNew" width="400" height="300"></canvas>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Diagram 1 -->
+  <div class="diagram-section">
+    <div class="diagram-title">How The System Works</div>
+    <div class="flow-container">
+      <div class="flow-box">
+        <h3>1. Radio Signals</h3>
+        <p>Enemy transmitters changing frequencies very fast.</p>
+      </div>
+      <div class="flow-arrow">➔</div>
+      <div class="flow-box">
+        <h3>2. AI Pattern Detector</h3>
+        <p>Scans the airwaves to find hidden connections.</p>
+      </div>
+      <div class="flow-arrow">➔</div>
+      <div class="flow-box">
+        <h3>3. AI Decision Maker</h3>
+        <p>Learns from experience to guess the enemy's next move.</p>
+      </div>
+      <div class="flow-arrow">➔</div>
+      <div class="flow-box">
+        <h3>4. Data Server</h3>
+        <p>Processes the information instantly without delay.</p>
+      </div>
+      <div class="flow-arrow">➔</div>
+      <div class="flow-box">
+        <h3>5. User Screen</h3>
+        <p>Shows a live, easy-to-read dashboard for operators.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagram 2 -->
+  <div class="diagram-section">
+    <div class="diagram-title">Inside the AI Brain</div>
+    <div class="brain-container">
+      <div class="brain-half">
+        <div class="brain-title">Part 1: The Scanner (Finding Patterns)</div>
+        <div class="brain-box">
+          <h4>Input Data</h4>
+          <p>Takes in raw signal strength and frequency data.</p>
+        </div>
+        <div class="brain-arrow">⬇</div>
+        <div class="brain-box">
+          <h4>Relationship Mapping</h4>
+          <p>Looks at how different frequencies relate to each other.</p>
+        </div>
+        <div class="brain-arrow">⬇</div>
+        <div class="brain-box">
+          <h4>Key Features Extraction</h4>
+          <p>Creates a summary of the most important signal patterns.</p>
+        </div>
+      </div>
+
+      <div class="brain-half">
+        <div class="brain-title">Part 2: The Player (Making Choices)</div>
+        <div class="brain-box">
+          <h4>Current Situation</h4>
+          <p>Looks at the summary provided by the Scanner.</p>
+        </div>
+        <div class="brain-arrow">⬇</div>
+        <div class="brain-box">
+          <h4>Experience Processing</h4>
+          <p>Compares the current situation to past successes and mistakes.</p>
+        </div>
+        <div class="brain-arrow">⬇</div>
+        <div class="brain-box">
+          <h4>Final Decision</h4>
+          <p>Chooses exactly which frequency channel to tune into next to catch the enemy.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ctxOld = document.getElementById('chartOld').getContext('2d');
+    const ctxNew = document.getElementById('chartNew').getContext('2d');
+    
+    // Gradient for our AI line
+    const gradientAI = ctxNew.createLinearGradient(0, 0, 0, 300);
+    gradientAI.addColorStop(0, 'rgba(45, 212, 168, 0.5)'); // Mint Green
+    gradientAI.addColorStop(1, 'rgba(45, 212, 168, 0.0)');
+
+    // Common options for both graphs
+    const commonOptions = {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          title: { display: true, text: 'Time (Minutes)', color: '#7a9a8e', font: { family: 'Space Grotesk', size: 12 } },
+          ticks: { color: '#7a9a8e' },
+          grid: { color: '#1a3c3c' }
+        },
+        y: {
+          title: { display: true, text: 'Detection Probability (%)', color: '#7a9a8e', font: { family: 'Space Grotesk', size: 12 } },
+          ticks: { color: '#7a9a8e', callback: function(value) { return value + '%'; } },
+          grid: { color: '#1a3c3c' },
+          min: 0,
+          max: 100
+        }
+      }
+    };
+
+    // Chart 1: Existing System
+    new Chart(ctxOld, {
+      type: 'line',
+      data: {
+        labels: ['0m', '10m', '20m', '30m', '40m', '50m', '60m'],
+        datasets: [{
+          data: [35, 36, 34, 35, 35, 36, 35],
+          borderColor: '#436257',
+          borderWidth: 3,
+          borderDash: [10, 5],
+          pointBackgroundColor: '#0A1A1A',
+          pointBorderColor: '#436257',
+          pointRadius: 4,
+          fill: false,
+          tension: 0.1
+        }]
+      },
+      options: commonOptions
+    });
+
+    // Chart 2: Smart Scan EW
+    new Chart(ctxNew, {
+      type: 'line',
+      data: {
+        labels: ['0m', '10m', '20m', '30m', '40m', '50m', '60m'],
+        datasets: [{
+          data: [25, 65, 82, 89, 93, 95, 96],
+          borderColor: '#2dd4a8',
+          backgroundColor: gradientAI,
+          borderWidth: 4,
+          pointBackgroundColor: '#0A1A1A',
+          pointBorderColor: '#2dd4a8',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: commonOptions
+    });
+  </script>
+</body>
+</html>
