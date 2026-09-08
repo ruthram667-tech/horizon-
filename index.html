@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Smart Scan EW — AI-powered Electronic Warfare Support System. Team HORIZON — SIH26055." />
+  <title>Smart Scan EW — Electronic Warfare Dashboard | Team HORIZON</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════
+       SIGN-IN PAGE
+       ════════════════════════════════════════════ -->
+  <div id="signin-page" class="page active">
+    <div class="signin-bg radar-grid">
+      <!-- Radar rings background -->
+      <div class="radar-rings">
+        <div class="radar-ring" style="width:400px;height:400px;opacity:0.4"></div>
+        <div class="radar-ring" style="width:300px;height:300px;opacity:0.3"></div>
+        <div class="radar-ring" style="width:200px;height:200px;opacity:0.2"></div>
+        <div class="radar-ring" style="width:100px;height:100px;opacity:0.15"></div>
+        <div class="radar-sweep"></div>
+      </div>
+
+      <div class="signin-card animate-fade-in-up">
+        <!-- Header -->
+        <div class="signin-header">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L3 7V12C3 17.55 6.84 22.74 12 24C17.16 22.74 21 17.55 21 12V7L12 2Z" fill="url(#sg)" stroke="rgba(45,212,168,0.5)" stroke-width="1"/>
+            <path d="M12 6L8 8.5V11.5C8 14.65 9.68 17.54 12 18.5C14.32 17.54 16 14.65 16 11.5V8.5L12 6Z" fill="rgba(10,26,26,0.6)" stroke="rgba(45,212,168,0.3)" stroke-width="0.5"/>
+            <path d="M11 11L12.5 12.5L15 9.5" stroke="#2dd4a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="sg" x1="3" y1="2" x2="21" y2="24"><stop offset="0%" stop-color="rgba(45,212,168,0.3)"/><stop offset="100%" stop-color="rgba(13,158,128,0.15)"/></linearGradient></defs>
+          </svg>
+          <h1>Smart Scan EW</h1>
+          <p class="subtitle">Secure Access Portal</p>
+          <div class="divider"></div>
+        </div>
+
+        <!-- Form -->
+        <form id="signin-form" onsubmit="return handleSignIn(event)">
+          <div class="field">
+            <label>Military Base</label>
+            <select id="select-base" class="select-field" required>
+              <option value="">— Select Base —</option>
+              <option value="nc-hq">Northern Command HQ • Udhampur</option>
+              <option value="ead-01">Eastern Air Defense Wing • Shillong</option>
+              <option value="wc-sec">Western Command Sector • Chandimandir</option>
+              <option value="sc-ops">Southern Command Operations • Pune</option>
+              <option value="nsd-07">Naval Station Delta-7 • Visakhapatnam</option>
+              <option value="caf-12">Central Air Force Station-12 • Nagpur</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Operator ID</label>
+            <input id="input-username" type="text" class="input-field" placeholder="Enter operator ID" required />
+          </div>
+          <div class="field">
+            <label>Access Key</label>
+            <input id="input-password" type="password" class="input-field" placeholder="Enter access key" required />
+          </div>
+          <div id="signin-error" class="error-msg" style="display:none"></div>
+          <button type="submit" id="btn-sign-in" class="btn-primary full-width">
+            🛡️ Authorize Access
+          </button>
+        </form>
+
+        <div class="signin-footer">
+          <div class="footer-row">
+            <span>Team HORIZON</span>
+            <span>SIH26055</span>
+          </div>
+          <p class="demo-hint">Demo: operator / smartscan</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       DASHBOARD PAGE
+       ════════════════════════════════════════════ -->
+  <div id="dashboard-page" class="page">
+    <!-- Navbar -->
+    <nav class="glass-navbar">
+      <div class="navbar-inner">
+        <div class="navbar-brand">
+          <div class="brand-icon">🛡️</div>
+          <div class="brand-text">
+            <h1>Smart Scan EW</h1>
+            <p id="nav-base-name">Team HORIZON • SIH26055</p>
+          </div>
+        </div>
+        <div class="navbar-right">
+          <div id="scan-badge" class="status-badge idle">
+            <span class="status-dot"></span>
+            <span id="scan-status-text">Idle</span>
+          </div>
+          <div class="connection-info">
+            <div class="connection-dot connected"></div>
+            <span>ONLINE</span>
+          </div>
+          <div class="auth-info">
+            <div class="auth-details">
+              <span id="nav-username">operator</span>
+              <span id="nav-region" class="auth-region">Region</span>
+            </div>
+            <button onclick="handleSignOut()" class="btn-signout" title="Sign Out">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Control Bar -->
+    <div class="control-bar">
+      <div class="glass-card control-inner">
+        <div class="controls-left">
+          <button id="btn-start-stop" class="btn-start" onclick="toggleScan()">
+            ▶ START SCAN
+          </button>
+          <div class="mode-toggle">
+            <button class="mode-btn active" onclick="setMode(this,'synthetic')">📡 Synthetic</button>
+            <button class="mode-btn" onclick="setMode(this,'hardware')">🔌 Hardware</button>
+          </div>
+          <select class="channel-select" onchange="setChannels(this.value)">
+            <option value="8">8 CH</option>
+            <option value="10">10 CH</option>
+            <option value="12" selected>12 CH</option>
+            <option value="16">16 CH</option>
+          </select>
+        </div>
+        <div class="controls-right">
+          <span>Band: 2.0–18.0 GHz</span>
+          <span class="accent">DQN + GAT</span>
+          <span>Slow Motion</span>
+          <span class="status-online">● ONLINE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content-area" style="display: flex; gap: 16px; padding: 8px 16px; flex: 1;">
+      <!-- Waterfall -->
+      <div class="glass-card waterfall-card" style="flex: 2; height: calc(100vh - 260px); display: flex; flex-direction: column; padding: 16px;">
+        <div class="card-header">
+          <h2><span class="diamond">◆</span> Waterfall Spectrogram</h2>
+          <span id="ch-count" class="card-meta">12 CH</span>
+        </div>
+        <div class="waterfall-wrap" style="flex: 1; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid rgba(26,60,60,0.2);">
+          <canvas id="waterfall-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+          <canvas id="overlay-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+        </div>
+      </div>
+
+      <!-- GNN Visualizer -->
+      <div class="glass-card gnn-card" style="flex: 1; height: calc(100vh - 260px); display: flex; flex-direction: column; padding: 16px;">
+        <div class="card-header">
+          <h2><span class="diamond">◆</span> GNN Attention Graph</h2>
+          <span class="card-meta">Live State</span>
+        </div>
+        <div class="gnn-wrap" style="flex: 1; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid rgba(26,60,60,0.2); background: rgba(10,26,26,0.5);">
+          <canvas id="gnn-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics Strip -->
+    <div class="metrics-strip">
+      <div class="glass-card metrics-inner">
+        <div class="metric-item">
+          <div class="mini-ring" id="ring-pd"></div>
+          <div class="metric-text">
+            <span class="metric-value teal" id="val-pd">0.0%</span>
+            <span class="metric-label">Detection P<sub>d</sub></span>
+          </div>
+        </div>
+        <div class="metric-item">
+          <div class="mini-ring" id="ring-pfa"></div>
+          <div class="metric-text">
+            <span class="metric-value lime" id="val-pfa">0.00%</span>
+            <span class="metric-label">False Alarm P<sub>fa</sub></span>
+          </div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-icon">🎯</div>
+          <div class="metric-text">
+            <span class="metric-value white" id="val-hits">0</span>
+            <span class="metric-label">Intercepts / <span id="val-hops">0</span></span>
+          </div>
+        </div>
+        <div class="metric-item">
+          <div class="mini-ring" id="ring-eff"></div>
+          <div class="metric-text">
+            <span class="metric-value coral" id="val-eff">0.0%</span>
+            <span class="metric-label">Efficiency</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=2"></script>
+</body>
+</html>
