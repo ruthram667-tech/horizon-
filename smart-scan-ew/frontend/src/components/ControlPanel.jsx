@@ -1,9 +1,9 @@
 /**
- * Smart Scan EW — Control Panel (Warm Palette)
- * ===============================================
- * Polished scan controls with animated buttons,
- * toggle switches, and smooth state transitions.
- * Gold / Flame / Crimson theme.
+ * Smart Scan EW — Control Panel (Arctic Teal — Compact Inline)
+ * ==============================================================
+ * Compact single-row control bar with Start/Stop, mode toggle,
+ * channel count, and connection status. Fits in dashboard top bar.
+ * Teal / Coral palette.
  */
 
 import React, { useState, useCallback } from 'react';
@@ -60,120 +60,90 @@ export default function ControlPanel({ isConnected, isRunning }) {
   }, [mode]);
 
   return (
-    <div className="glass-card p-4 h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
-          <span className="text-gold-400 mr-2">◆</span>
-          Scan Controls
-        </h2>
-        {/* Connection status */}
-        <div className="flex items-center gap-2">
-          <div className={isConnected ? 'connection-dot-connected' : 'connection-dot-disconnected'} />
-          <span className="text-xs text-gray-400 font-mono">
-            {isConnected ? 'ONLINE' : 'OFFLINE'}
-          </span>
-        </div>
-      </div>
-
-      <div className="space-y-4">
+    <div className="glass-card px-4 py-2.5 flex items-center justify-between gap-4">
+      {/* Left: Start/Stop + Mode */}
+      <div className="flex items-center gap-3">
         {/* Start / Stop Button */}
         <button
           id="btn-start-stop"
           onClick={handleStartStop}
           disabled={loading}
-          className={`w-full ${running ? 'btn-stop' : 'btn-start'} ${loading ? 'opacity-50 cursor-wait' : ''}`}
+          className={`${running ? 'btn-stop' : 'btn-start'} px-5 py-2 text-xs ${loading ? 'opacity-50 cursor-wait' : ''}`}
         >
           {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
               Processing...
             </span>
           ) : running ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="w-3 h-3 bg-white rounded-sm" />
+            <span className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 bg-white rounded-sm" />
               STOP SCAN
             </span>
           ) : (
-            <span className="flex items-center justify-center gap-2">
-              <span className="w-0 h-0 border-l-[10px] border-l-black border-y-[6px] border-y-transparent" />
+            <span className="flex items-center gap-2">
+              <span className="w-0 h-0 border-l-[8px] border-l-base-900 border-y-[5px] border-y-transparent" />
               START SCAN
             </span>
           )}
         </button>
 
         {/* Mode Toggle */}
-        <div>
-          <label className="stat-label block mb-2">Scan Mode</label>
-          <div className="flex rounded-xl overflow-hidden border border-surface-600/30">
-            <button
-              id="btn-mode-synthetic"
-              onClick={() => handleModeChange('synthetic')}
-              className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200
-                ${mode === 'synthetic'
-                  ? 'bg-gold-600/20 text-gold-400 border-r border-gold-500/30'
-                  : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30 border-r border-surface-600/30'
-                }`}
-            >
-              📡 Synthetic
-            </button>
-            <button
-              id="btn-mode-hardware"
-              onClick={() => handleModeChange('hardware')}
-              className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200
-                ${mode === 'hardware'
-                  ? 'bg-flame-600/20 text-flame-400'
-                  : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30'
-                }`}
-            >
-              🔌 Hardware
-            </button>
-          </div>
+        <div className="flex rounded-lg overflow-hidden border border-base-600/30">
+          <button
+            id="btn-mode-synthetic"
+            onClick={() => handleModeChange('synthetic')}
+            className={`px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all duration-200
+              ${mode === 'synthetic'
+                ? 'bg-teal-800/30 text-teal-400 border-r border-teal-500/30'
+                : 'bg-base-700/30 text-sage-500 hover:bg-base-600/30 border-r border-base-600/30'
+              }`}
+          >
+            📡 Synthetic
+          </button>
+          <button
+            id="btn-mode-hardware"
+            onClick={() => handleModeChange('hardware')}
+            className={`px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all duration-200
+              ${mode === 'hardware'
+                ? 'bg-coral-800/30 text-coral-400'
+                : 'bg-base-700/30 text-sage-500 hover:bg-base-600/30'
+              }`}
+          >
+            🔌 Hardware
+          </button>
         </div>
 
         {/* Channel Count */}
-        <div>
-          <label className="stat-label block mb-2">Channel Count</label>
-          <select
-            id="select-channels"
-            value={channelCount}
-            onChange={(e) => handleChannelChange(e.target.value)}
-            className="w-full bg-surface-700/50 border border-surface-600/30 rounded-xl px-3 py-2.5
-                       text-sm text-gray-200 font-mono
-                       focus:outline-none focus:ring-2 focus:ring-gold-500/30 focus:border-gold-500/30
-                       appearance-none cursor-pointer transition-all duration-200"
-          >
-            <option value={8}>8 Channels (2–18 GHz)</option>
-            <option value={10}>10 Channels (2–18 GHz)</option>
-            <option value={12}>12 Channels (2–18 GHz)</option>
-            <option value={16}>16 Channels (2–18 GHz)</option>
-          </select>
-        </div>
+        <select
+          id="select-channels"
+          value={channelCount}
+          onChange={(e) => handleChannelChange(e.target.value)}
+          className="bg-base-700/50 border border-base-600/30 rounded-lg px-2.5 py-1.5
+                     text-xs text-sage-200 font-mono
+                     focus:outline-none focus:ring-1 focus:ring-teal-500/30
+                     appearance-none cursor-pointer transition-all duration-200"
+        >
+          <option value={8}>8 CH</option>
+          <option value={10}>10 CH</option>
+          <option value={12}>12 CH</option>
+          <option value={16}>16 CH</option>
+        </select>
+      </div>
 
-        {/* System Info */}
-        <div className="pt-3 border-t border-surface-600/20">
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="text-gray-500">Band</span>
-              <span className="text-gray-300 font-mono">2.0 – 18.0 GHz</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-gray-500">Algorithm</span>
-              <span className="text-gray-300 font-mono">DQN + GAT</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-gray-500">Scan Speed</span>
-              <span className="text-gold-400 font-mono">~2 FPS</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-gray-500">Mode</span>
-              <span className={`font-mono ${mode === 'synthetic' ? 'text-gold-400' : 'text-flame-400'}`}>
-                {mode.toUpperCase()}
-              </span>
-            </div>
-          </div>
+      {/* Right: System Info */}
+      <div className="flex items-center gap-4 text-[10px] text-sage-500 font-mono">
+        <span>Band: 2.0–18.0 GHz</span>
+        <span className="text-teal-400">DQN + GAT</span>
+        <span>~2 FPS</span>
+        <div className="flex items-center gap-1.5">
+          <div className={isConnected ? 'connection-dot-connected' : 'connection-dot-disconnected'} style={{ width: 6, height: 6 }} />
+          <span className={isConnected ? 'text-teal-400' : 'text-coral-400'}>
+            {isConnected ? 'ONLINE' : 'OFFLINE'}
+          </span>
         </div>
       </div>
     </div>

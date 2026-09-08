@@ -1,8 +1,8 @@
 /**
- * Smart Scan EW — Settings Page (Warm Palette)
+ * Smart Scan EW — Settings Page (Arctic Teal)
  * ===============================================
  * System configuration, model selection, and health monitoring.
- * Gold / Flame / Crimson theme — no blue or purple.
+ * Teal / Lime / Coral / Sage palette.
  */
 
 import React, { useState, useCallback } from 'react';
@@ -47,14 +47,14 @@ export default function SettingsPage({ isConnected, isRunning }) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-sm text-gray-400">Configure scan parameters, model settings, and view system health</p>
+          <p className="text-sm text-sage-400">Configure scan parameters, model settings, and view system health</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* ── Scan Configuration ── */}
           <div className="glass-card p-6">
             <h3 className="text-sm font-semibold text-white mb-5 uppercase tracking-wider flex items-center gap-2">
-              <span className="text-gold-400">◆</span>
+              <span className="text-teal-400">◆</span>
               Scan Configuration
             </h3>
 
@@ -62,13 +62,13 @@ export default function SettingsPage({ isConnected, isRunning }) {
               {/* Mode */}
               <div>
                 <label className="stat-label block mb-2">Scan Mode</label>
-                <div className="flex rounded-xl overflow-hidden border border-surface-600/30">
+                <div className="flex rounded-xl overflow-hidden border border-base-600/30">
                   <button
                     onClick={() => setMode('synthetic')}
                     className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200
                       ${mode === 'synthetic'
-                        ? 'bg-gold-600/20 text-gold-400 border-r border-gold-500/30'
-                        : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30 border-r border-surface-600/30'
+                        ? 'bg-teal-800/20 text-teal-400 border-r border-teal-500/30'
+                        : 'bg-base-700/30 text-sage-500 hover:bg-base-600/30 border-r border-base-600/30'
                       }`}
                   >
                     📡 Synthetic
@@ -77,8 +77,8 @@ export default function SettingsPage({ isConnected, isRunning }) {
                     onClick={() => setMode('hardware')}
                     className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200
                       ${mode === 'hardware'
-                        ? 'bg-flame-600/20 text-flame-400'
-                        : 'bg-surface-700/30 text-gray-500 hover:bg-surface-600/30'
+                        ? 'bg-coral-800/20 text-coral-400'
+                        : 'bg-base-700/30 text-sage-500 hover:bg-base-600/30'
                       }`}
                   >
                     🔌 Hardware
@@ -92,10 +92,7 @@ export default function SettingsPage({ isConnected, isRunning }) {
                 <select
                   value={channelCount}
                   onChange={(e) => setChannelCount(parseInt(e.target.value))}
-                  className="w-full bg-surface-700/50 border border-surface-600/30 rounded-xl px-4 py-3
-                             text-sm text-gray-200 font-mono
-                             focus:outline-none focus:ring-2 focus:ring-gold-500/30 focus:border-gold-500/30
-                             appearance-none cursor-pointer transition-all duration-200"
+                  className="select-field"
                 >
                   <option value={8}>8 Channels (2–18 GHz)</option>
                   <option value={10}>10 Channels (2–18 GHz)</option>
@@ -117,10 +114,10 @@ export default function SettingsPage({ isConnected, isRunning }) {
                     onChange={(e) => setEmitterCount(parseInt(e.target.value))}
                     className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
                     style={{
-                      background: `linear-gradient(to right, #FFB800 0%, #FFB800 ${(emitterCount - 1) / 4 * 100}%, rgba(39,44,56,0.8) ${(emitterCount - 1) / 4 * 100}%, rgba(39,44,56,0.8) 100%)`,
+                      background: `linear-gradient(to right, #2dd4a8 0%, #2dd4a8 ${(emitterCount - 1) / 4 * 100}%, rgba(26,60,60,0.8) ${(emitterCount - 1) / 4 * 100}%, rgba(26,60,60,0.8) 100%)`,
                     }}
                   />
-                  <span className="text-sm font-mono text-gold-400 w-6 text-right">{emitterCount}</span>
+                  <span className="text-sm font-mono text-teal-400 w-6 text-right">{emitterCount}</span>
                 </div>
               </div>
 
@@ -137,10 +134,10 @@ export default function SettingsPage({ isConnected, isRunning }) {
                     onChange={(e) => setThreshold(parseInt(e.target.value))}
                     className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
                     style={{
-                      background: `linear-gradient(to right, #FF6B35 0%, #FF6B35 ${(threshold + 80) / 60 * 100}%, rgba(39,44,56,0.8) ${(threshold + 80) / 60 * 100}%, rgba(39,44,56,0.8) 100%)`,
+                      background: `linear-gradient(to right, #84cc16 0%, #84cc16 ${(threshold + 80) / 60 * 100}%, rgba(26,60,60,0.8) ${(threshold + 80) / 60 * 100}%, rgba(26,60,60,0.8) 100%)`,
                     }}
                   />
-                  <span className="text-sm font-mono text-flame-400 w-16 text-right">{threshold} dBm</span>
+                  <span className="text-sm font-mono text-lime-400 w-16 text-right">{threshold} dBm</span>
                 </div>
               </div>
 
@@ -173,42 +170,42 @@ export default function SettingsPage({ isConnected, isRunning }) {
           <div className="space-y-6">
             <div className="glass-card p-6">
               <h3 className="text-sm font-semibold text-white mb-5 uppercase tracking-wider flex items-center gap-2">
-                <span className="text-flame-400">◆</span>
+                <span className="text-lime-400">◆</span>
                 System Health
               </h3>
 
               <div className="space-y-4">
                 {/* Backend Status */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-surface-700/30 border border-surface-600/20">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-base-700/30 border border-base-600/20">
                   <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-gold-400' : 'bg-crimson-500'}`}
-                      style={{ boxShadow: isConnected ? '0 0 8px rgba(255,184,0,0.5)' : '0 0 8px rgba(220,38,38,0.5)' }} />
-                    <span className="text-sm text-gray-300">Backend Server</span>
+                    <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-teal-400' : 'bg-coral-400'}`}
+                      style={{ boxShadow: isConnected ? '0 0 8px rgba(45,212,168,0.5)' : '0 0 8px rgba(232,97,77,0.5)' }} />
+                    <span className="text-sm text-sage-300">Backend Server</span>
                   </div>
-                  <span className={`text-xs font-mono ${isConnected ? 'text-gold-400' : 'text-crimson-400'}`}>
+                  <span className={`text-xs font-mono ${isConnected ? 'text-teal-400' : 'text-coral-400'}`}>
                     {isConnected ? 'ONLINE' : 'OFFLINE'}
                   </span>
                 </div>
 
                 {/* WebSocket */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-surface-700/30 border border-surface-600/20">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-base-700/30 border border-base-600/20">
                   <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-gold-400' : 'bg-gray-600'}`}
-                      style={{ boxShadow: isConnected ? '0 0 8px rgba(255,184,0,0.5)' : 'none' }} />
-                    <span className="text-sm text-gray-300">WebSocket Stream</span>
+                    <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-teal-400' : 'bg-sage-600'}`}
+                      style={{ boxShadow: isConnected ? '0 0 8px rgba(45,212,168,0.5)' : 'none' }} />
+                    <span className="text-sm text-sage-300">WebSocket Stream</span>
                   </div>
-                  <span className={`text-xs font-mono ${isConnected ? 'text-gold-400' : 'text-gray-500'}`}>
+                  <span className={`text-xs font-mono ${isConnected ? 'text-teal-400' : 'text-sage-500'}`}>
                     {isConnected ? '~2 FPS (Display)' : 'DISCONNECTED'}
                   </span>
                 </div>
 
                 {/* Scan Status */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-surface-700/30 border border-surface-600/20">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-base-700/30 border border-base-600/20">
                   <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${isRunning ? 'bg-gold-400 animate-pulse' : 'bg-gray-600'}`} />
-                    <span className="text-sm text-gray-300">Scan Engine</span>
+                    <div className={`w-3 h-3 rounded-full ${isRunning ? 'bg-teal-400 animate-pulse' : 'bg-sage-600'}`} />
+                    <span className="text-sm text-sage-300">Scan Engine</span>
                   </div>
-                  <span className={`text-xs font-mono ${isRunning ? 'text-gold-400' : 'text-gray-500'}`}>
+                  <span className={`text-xs font-mono ${isRunning ? 'text-teal-400' : 'text-sage-500'}`}>
                     {isRunning ? 'ACTIVE' : 'IDLE'}
                   </span>
                 </div>
@@ -218,7 +215,7 @@ export default function SettingsPage({ isConnected, isRunning }) {
             {/* ── Model Info ── */}
             <div className="glass-card p-6">
               <h3 className="text-sm font-semibold text-white mb-5 uppercase tracking-wider flex items-center gap-2">
-                <span className="text-crimson-400">◆</span>
+                <span className="text-coral-400">◆</span>
                 AI Model Info
               </h3>
 
@@ -234,8 +231,8 @@ export default function SettingsPage({ isConnected, isRunning }) {
                   { label: 'Target Update', value: 'Soft τ=0.005' },
                 ].map((item) => (
                   <div key={item.label} className="flex justify-between text-xs py-1">
-                    <span className="text-gray-500">{item.label}</span>
-                    <span className="text-gray-300 font-mono">{item.value}</span>
+                    <span className="text-sage-500">{item.label}</span>
+                    <span className="text-sage-200 font-mono">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -244,7 +241,7 @@ export default function SettingsPage({ isConnected, isRunning }) {
             {/* ── Band Info ── */}
             <div className="glass-card p-6">
               <h3 className="text-sm font-semibold text-white mb-5 uppercase tracking-wider flex items-center gap-2">
-                <span className="text-amber-400">◆</span>
+                <span className="text-sage-400">◆</span>
                 Frequency Band
               </h3>
               <div className="space-y-3">
@@ -256,8 +253,8 @@ export default function SettingsPage({ isConnected, isRunning }) {
                   { label: 'Display Rate', value: '~2 FPS (Slow Scan)' },
                 ].map((item) => (
                   <div key={item.label} className="flex justify-between text-xs py-1">
-                    <span className="text-gray-500">{item.label}</span>
-                    <span className="text-gray-300 font-mono">{item.value}</span>
+                    <span className="text-sage-500">{item.label}</span>
+                    <span className="text-sage-200 font-mono">{item.value}</span>
                   </div>
                 ))}
               </div>

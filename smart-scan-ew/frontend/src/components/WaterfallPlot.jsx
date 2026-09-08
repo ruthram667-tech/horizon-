@@ -1,49 +1,56 @@
 /**
- * Smart Scan EW — Waterfall Spectrogram (Thermal Palette)
- * =========================================================
- * High-performance real-time 2D waterfall display using HTML5 Canvas.
- * Renders frequency channels (X-axis) vs time (Y-axis, scrolling down)
- * with THERMAL color-coded power levels (black→red→orange→gold→white)
- * and overlay markers. Slowed scan with sweep line animation.
+ * Smart Scan EW — Waterfall Spectrogram (Night-Vision Teal)
+ * ===========================================================
+ * Real-time 2D waterfall using HTML5 Canvas.
+ * Colormap: Deep green → Teal → Mint → White (night-vision feel)
+ * Sweep line in mint, markers in lime/coral.
+ *
+ * Team HORIZON — SIH26055
  */
 
 import React, { useRef, useEffect, useCallback } from 'react';
 
-// Thermal color palette: black → dark red → orange → gold → white
+// Night-vision teal colormap: dark → deep green → teal → mint → white
 const COLORMAP = [];
 for (let i = 0; i < 256; i++) {
   const t = i / 255;
   let r, g, b;
-  if (t < 0.2) {
-    // Black → Dark Red
-    const s = t / 0.2;
-    r = Math.floor(s * 120);
-    g = Math.floor(s * 8);
-    b = Math.floor(s * 5);
-  } else if (t < 0.45) {
-    // Dark Red → Orange
-    const s = (t - 0.2) / 0.25;
-    r = Math.floor(120 + s * 135);
-    g = Math.floor(8 + s * 80);
-    b = Math.floor(5 - s * 5);
-  } else if (t < 0.7) {
-    // Orange → Gold
-    const s = (t - 0.45) / 0.25;
-    r = Math.floor(255);
-    g = Math.floor(88 + s * 96);
-    b = Math.floor(0 + s * 15);
+  if (t < 0.15) {
+    // Near black → very dark green
+    const s = t / 0.15;
+    r = Math.floor(s * 6);
+    g = Math.floor(s * 18);
+    b = Math.floor(s * 14);
+  } else if (t < 0.35) {
+    // Dark green → deep teal
+    const s = (t - 0.15) / 0.2;
+    r = Math.floor(6 + s * 7);
+    g = Math.floor(18 + s * 52);
+    b = Math.floor(14 + s * 45);
+  } else if (t < 0.55) {
+    // Deep teal → bright teal
+    const s = (t - 0.35) / 0.2;
+    r = Math.floor(13 + s * 32);
+    g = Math.floor(70 + s * 142);
+    b = Math.floor(59 + s * 109);
+  } else if (t < 0.75) {
+    // Bright teal → mint
+    const s = (t - 0.55) / 0.2;
+    r = Math.floor(45 + s * 36);
+    g = Math.floor(212 + s * 35);
+    b = Math.floor(168 + s * 62);
   } else if (t < 0.9) {
-    // Gold → Bright Yellow
-    const s = (t - 0.7) / 0.2;
-    r = 255;
-    g = Math.floor(184 + s * 55);
-    b = Math.floor(15 + s * 60);
+    // Mint → bright mint-white
+    const s = (t - 0.75) / 0.15;
+    r = Math.floor(81 + s * 120);
+    g = Math.floor(247 + s * 8);
+    b = Math.floor(230 + s * 20);
   } else {
-    // Bright Yellow → White
+    // Bright mint → white
     const s = (t - 0.9) / 0.1;
-    r = 255;
-    g = Math.floor(239 + s * 16);
-    b = Math.floor(75 + s * 180);
+    r = Math.floor(201 + s * 54);
+    g = 255;
+    b = Math.floor(250 + s * 5);
   }
   COLORMAP.push([r, g, b]);
 }
@@ -97,10 +104,10 @@ export default function WaterfallPlot({ data }) {
     }
 
     if (history.length === 0) {
-      ctx.fillStyle = '#0B0D10';
+      ctx.fillStyle = '#0A1A1A';
       ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#4a5568';
-      ctx.font = '14px Outfit, sans-serif';
+      ctx.fillStyle = '#577b6e';
+      ctx.font = '14px Space Grotesk, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Waiting for scan data...', w / 2, h / 2);
       animFrameRef.current = requestAnimationFrame(render);
@@ -113,7 +120,7 @@ export default function WaterfallPlot({ data }) {
     const cellHeight = h / MAX_ROWS;
 
     // ── Draw waterfall heatmap ──
-    ctx.fillStyle = '#0B0D10';
+    ctx.fillStyle = '#0A1A1A';
     ctx.fillRect(0, 0, w, h);
 
     for (let row = 0; row < numRows; row++) {
@@ -122,7 +129,6 @@ export default function WaterfallPlot({ data }) {
 
       for (let ch = 0; ch < numChannels; ch++) {
         const power = rowData.powers[ch];
-        // Normalize: -90 dBm → 0, -10 dBm → 1
         const norm = Math.max(0, Math.min(1, (power - (-90)) / 80));
         const colorIdx = Math.floor(norm * 255);
         const [r, g, b] = COLORMAP[colorIdx];
@@ -137,22 +143,22 @@ export default function WaterfallPlot({ data }) {
       }
     }
 
-    // ── Slow sweep scan line ──
-    sweepRef.current += 0.003; // Very slow sweep
+    // ── Sweep scan line ──
+    sweepRef.current += 0.003;
     if (sweepRef.current > 1) sweepRef.current = 0;
     const sweepY = h * sweepRef.current;
 
     ctx.beginPath();
     ctx.moveTo(0, sweepY);
     ctx.lineTo(w, sweepY);
-    ctx.strokeStyle = 'rgba(255, 184, 0, 0.4)';
+    ctx.strokeStyle = 'rgba(45, 212, 168, 0.5)';
     ctx.lineWidth = 2;
     ctx.stroke();
 
     // Sweep glow
     const sweepGrad = ctx.createLinearGradient(0, sweepY - 15, 0, sweepY + 15);
     sweepGrad.addColorStop(0, 'transparent');
-    sweepGrad.addColorStop(0.5, 'rgba(255, 184, 0, 0.08)');
+    sweepGrad.addColorStop(0.5, 'rgba(45, 212, 168, 0.1)');
     sweepGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = sweepGrad;
     ctx.fillRect(0, sweepY - 15, w, 30);
@@ -163,20 +169,20 @@ export default function WaterfallPlot({ data }) {
       const latest = history[numRows - 1];
       const latestY = h - cellHeight;
 
-      // Active target channels (crimson glow for missed)
+      // Active target channels (coral glow for missed)
       for (const ch of latest.active_target_ch) {
         if (ch !== latest.tuned_ch) {
           const x = ch * cellWidth + cellWidth / 2;
           octx.beginPath();
           octx.arc(x, latestY + cellHeight / 2, cellWidth / 3, 0, Math.PI * 2);
-          octx.strokeStyle = 'rgba(220, 38, 38, 0.9)';
+          octx.strokeStyle = 'rgba(232, 97, 77, 0.9)';
           octx.lineWidth = 2;
           octx.stroke();
 
-          // Pulse effect
+          // Pulse
           octx.beginPath();
           octx.arc(x, latestY + cellHeight / 2, cellWidth / 2, 0, Math.PI * 2);
-          octx.strokeStyle = 'rgba(220, 38, 38, 0.3)';
+          octx.strokeStyle = 'rgba(232, 97, 77, 0.3)';
           octx.lineWidth = 1;
           octx.stroke();
         }
@@ -185,25 +191,25 @@ export default function WaterfallPlot({ data }) {
       // Tuned channel marker
       const tunedX = latest.tuned_ch * cellWidth;
       if (latest.is_hit) {
-        // Hit: green flash
-        octx.fillStyle = 'rgba(34, 197, 94, 0.3)';
+        // Hit: lime flash
+        octx.fillStyle = 'rgba(132, 204, 22, 0.25)';
         octx.fillRect(tunedX, 0, cellWidth, h);
-        octx.strokeStyle = 'rgba(34, 197, 94, 0.9)';
+        octx.strokeStyle = 'rgba(132, 204, 22, 0.9)';
         octx.lineWidth = 2;
         octx.strokeRect(tunedX, latestY, cellWidth, cellHeight);
       } else {
-        // Tuned but no hit: gold indicator
-        octx.fillStyle = 'rgba(255, 184, 0, 0.12)';
+        // Tuned but no hit: teal indicator
+        octx.fillStyle = 'rgba(45, 212, 168, 0.12)';
         octx.fillRect(tunedX, 0, cellWidth, h);
-        octx.strokeStyle = 'rgba(255, 184, 0, 0.6)';
+        octx.strokeStyle = 'rgba(45, 212, 168, 0.6)';
         octx.lineWidth = 1.5;
         octx.strokeRect(tunedX, latestY, cellWidth, cellHeight);
       }
 
       // Channel labels at top
-      octx.font = '10px JetBrains Mono, monospace';
+      octx.font = '10px IBM Plex Mono, monospace';
       octx.textAlign = 'center';
-      octx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      octx.fillStyle = 'rgba(232, 240, 236, 0.4)';
       for (let ch = 0; ch < numChannels; ch++) {
         octx.fillText(
           `${ch}`,
@@ -214,8 +220,8 @@ export default function WaterfallPlot({ data }) {
 
       // Y-axis time label
       octx.save();
-      octx.font = '9px Outfit, sans-serif';
-      octx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      octx.font = '9px Space Grotesk, sans-serif';
+      octx.fillStyle = 'rgba(232, 240, 236, 0.3)';
       octx.textAlign = 'left';
       octx.fillText('← TIME', 4, h - 4);
       octx.fillText('NOW →', 4, latestY - 2);
@@ -235,15 +241,15 @@ export default function WaterfallPlot({ data }) {
   return (
     <div className="glass-card p-4 h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
-          <span className="text-flame-400 mr-2">◆</span>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-sage-300">
+          <span className="text-teal-400 mr-2">◆</span>
           Waterfall Spectrogram
         </h2>
-        <span className="text-xs text-gray-500 font-mono">
+        <span className="text-xs text-sage-500 font-mono">
           {data ? `${data.channel_powers?.length || 0} CH` : '—'}
         </span>
       </div>
-      <div className="waterfall-container flex-1 relative rounded-lg overflow-hidden border border-surface-600/20">
+      <div className="waterfall-container flex-1 relative rounded-xl overflow-hidden border border-base-600/20">
         <canvas ref={canvasRef} className="absolute inset-0" />
         <canvas ref={overlayCanvasRef} className="absolute inset-0" />
       </div>

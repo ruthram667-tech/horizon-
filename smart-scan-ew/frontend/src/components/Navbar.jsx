@@ -1,15 +1,15 @@
 /**
- * Smart Scan EW — Navbar (Warm Tactical)
- * ========================================
- * Premium persistent navigation bar with brand, page links,
- * scan status, and WebSocket connection indicator.
- * Colors: Gold / Flame / Crimson palette.
+ * Smart Scan EW — Navbar (Arctic Teal)
+ * =======================================
+ * Navigation bar with brand, page links, scan status,
+ * WebSocket connection indicator, auth display, and sign-out.
+ * Teal / Mint / Sage palette.
  */
 
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
-export default function Navbar({ isConnected, isRunning, connectionStatus }) {
+export default function Navbar({ isConnected, isRunning, connectionStatus, auth, onSignOut }) {
   const location = useLocation();
   const isLanding = location.pathname === '/';
 
@@ -18,15 +18,15 @@ export default function Navbar({ isConnected, isRunning, connectionStatus }) {
       <div className="max-w-[1920px] mx-auto px-6 py-3 flex items-center justify-between">
         {/* ── Brand ── */}
         <NavLink to="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gold-400 to-flame-400 flex items-center justify-center shadow-lg group-hover:shadow-gold-400/20 transition-shadow duration-300">
-            <span className="text-black font-bold text-base">⚡</span>
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-400 flex items-center justify-center shadow-lg group-hover:shadow-teal-400/20 transition-shadow duration-300">
+            <span className="text-base-900 font-bold text-base">🛡️</span>
           </div>
           <div className="flex flex-col">
             <h1 className="text-sm font-bold tracking-tight text-white leading-tight">
               Smart Scan EW
             </h1>
-            <p className="text-[9px] text-gray-500 uppercase tracking-[0.2em] leading-tight">
-              Team HORIZON • SIH26055
+            <p className="text-[9px] text-sage-500 uppercase tracking-[0.2em] leading-tight">
+              {auth ? auth.baseName : 'Team HORIZON • SIH26055'}
             </p>
           </div>
         </NavLink>
@@ -71,19 +71,19 @@ export default function Navbar({ isConnected, isRunning, connectionStatus }) {
           </div>
         )}
 
-        {/* ── Status Indicators ── */}
+        {/* ── Status Indicators + Auth ── */}
         <div className="flex items-center gap-4">
           {!isLanding && (
             <>
               {/* Scan Status Badge */}
               <div className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider border transition-all duration-300
                 ${isRunning
-                  ? 'bg-gold-400/10 border-gold-400/30 text-gold-400'
-                  : 'bg-surface-700/50 border-surface-600/30 text-gray-500'
+                  ? 'bg-teal-400/10 border-teal-400/30 text-teal-400'
+                  : 'bg-base-700/50 border-base-600/30 text-sage-500'
                 }`}
               >
                 <span className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-gold-400 animate-pulse' : 'bg-gray-600'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-teal-400 animate-pulse' : 'bg-sage-600'}`} />
                   {isRunning ? 'Scanning' : 'Idle'}
                 </span>
               </div>
@@ -91,10 +91,29 @@ export default function Navbar({ isConnected, isRunning, connectionStatus }) {
               {/* Connection Status */}
               <div className="flex items-center gap-1.5">
                 <div className={isConnected ? 'connection-dot-connected' : 'connection-dot-disconnected'} />
-                <span className="text-xs text-gray-400 font-mono hidden sm:inline">
+                <span className="text-xs text-sage-400 font-mono hidden sm:inline">
                   {connectionStatus}
                 </span>
               </div>
+
+              {/* Auth Info */}
+              {auth && (
+                <div className="hidden md:flex items-center gap-3 pl-3 border-l border-base-600/30">
+                  <div className="text-right">
+                    <div className="text-xs text-white font-medium">{auth.username}</div>
+                    <div className="text-[9px] text-sage-500 uppercase tracking-wider">{auth.baseRegion}</div>
+                  </div>
+                  <button
+                    onClick={onSignOut}
+                    className="p-1.5 rounded-lg hover:bg-coral-400/10 text-sage-400 hover:text-coral-400 transition-all duration-200"
+                    title="Sign Out"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </>
           )}
 

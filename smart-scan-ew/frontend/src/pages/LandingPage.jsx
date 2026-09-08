@@ -1,9 +1,9 @@
 /**
- * Smart Scan EW — Landing Page (Warm Palette)
- * ==============================================
+ * Smart Scan EW — Landing Page (Arctic Teal)
+ * =============================================
  * Premium hero section with animated background, features showcase,
  * architecture overview, and CTA to launch the dashboard.
- * Colors: Gold / Flame / Crimson — No blue or purple.
+ * Palette: Teal / Mint / Lime / Coral
  */
 
 import React from 'react';
@@ -16,7 +16,7 @@ const FEATURES = [
     title: 'Graph Neural Network',
     subtitle: '2-Layer GAT Architecture',
     description: 'Models frequency channels as a graph with spectral adjacency and observed hop transitions. 4-head attention produces rich 32-dim node embeddings.',
-    color: 'gold',
+    color: 'teal',
     stats: '4→128→32',
   },
   {
@@ -24,7 +24,7 @@ const FEATURES = [
     title: 'Deep Q-Network',
     subtitle: 'Reinforcement Learning Agent',
     description: 'Double DQN with experience replay learns optimal tuning strategies. Adapts in real-time to evolving FHSS patterns without prior intelligence.',
-    color: 'flame',
+    color: 'lime',
     stats: 'ε-greedy',
   },
   {
@@ -32,7 +32,7 @@ const FEATURES = [
     title: 'FHSS Interception',
     subtitle: 'Markov Hopping Simulator',
     description: 'Synthetic RF simulator generates realistic frequency-hopping signals with evolving transition matrices and AWGN noise modeling.',
-    color: 'amber',
+    color: 'sage',
     stats: '2–18 GHz',
   },
   {
@@ -40,17 +40,17 @@ const FEATURES = [
     title: 'Real-Time Streaming',
     subtitle: 'Slow Scan Visualization',
     description: 'High-performance FastAPI backend streams live telemetry via WebSocket with canvas-rendered waterfall spectrogram and GNN graph visualization.',
-    color: 'crimson',
+    color: 'coral',
     stats: '~2 FPS',
   },
 ];
 
 const ARCH_NODES = [
-  { id: 'rf', label: 'RF Simulator', sub: 'FHSS / AWGN', icon: '📻', color: 'amber' },
-  { id: 'gnn', label: 'GNN Embedder', sub: '2-Layer GAT', icon: '🧠', color: 'gold' },
-  { id: 'rl', label: 'RL Agent', sub: 'Double DQN', icon: '🎯', color: 'flame' },
-  { id: 'api', label: 'FastAPI + WS', sub: 'REST + Stream', icon: '🔌', color: 'crimson' },
-  { id: 'ui', label: 'React Dashboard', sub: 'Canvas + Glass', icon: '🖥️', color: 'gold' },
+  { id: 'rf', label: 'RF Simulator', sub: 'FHSS / AWGN', icon: '📻', color: 'sage' },
+  { id: 'gnn', label: 'GNN Embedder', sub: '2-Layer GAT', icon: '🧠', color: 'teal' },
+  { id: 'rl', label: 'RL Agent', sub: 'Double DQN', icon: '🎯', color: 'lime' },
+  { id: 'api', label: 'FastAPI + WS', sub: 'REST + Stream', icon: '🔌', color: 'coral' },
+  { id: 'ui', label: 'React Dashboard', sub: 'Canvas + Glass', icon: '🖥️', color: 'teal' },
 ];
 
 const TEAM_STATS = [
@@ -62,10 +62,10 @@ const TEAM_STATS = [
 
 function FeatureCard({ feature, index }) {
   const colorMap = {
-    gold: { border: 'hover:border-gold-400/30', glow: 'rgba(255,184,0,0.15)', text: 'text-gold-400', bg: 'bg-gold-400/10' },
-    flame: { border: 'hover:border-flame-400/30', glow: 'rgba(255,107,53,0.15)', text: 'text-flame-400', bg: 'bg-flame-400/10' },
-    amber: { border: 'hover:border-amber-400/30', glow: 'rgba(251,191,36,0.15)', text: 'text-amber-400', bg: 'bg-amber-400/10' },
-    crimson: { border: 'hover:border-crimson-400/30', glow: 'rgba(220,38,38,0.15)', text: 'text-crimson-400', bg: 'bg-crimson-500/10' },
+    teal: { border: 'hover:border-teal-400/30', text: 'text-teal-400', bg: 'bg-teal-400/10' },
+    lime: { border: 'hover:border-lime-400/30', text: 'text-lime-400', bg: 'bg-lime-400/10' },
+    sage: { border: 'hover:border-sage-400/30', text: 'text-sage-400', bg: 'bg-sage-400/10' },
+    coral: { border: 'hover:border-coral-400/30', text: 'text-coral-400', bg: 'bg-coral-400/10' },
   };
   const c = colorMap[feature.color];
 
@@ -85,7 +85,7 @@ function FeatureCard({ feature, index }) {
       <p className={`text-xs font-medium ${c.text} uppercase tracking-wider mb-3`}>
         {feature.subtitle}
       </p>
-      <p className="text-sm text-gray-400 leading-relaxed">
+      <p className="text-sm text-sage-400 leading-relaxed">
         {feature.description}
       </p>
     </div>
@@ -97,13 +97,13 @@ function ArchitectureSection() {
     <section className="py-20 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 animate-fade-in-up">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold-400 mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-teal-400 mb-3">
             System Architecture
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             End-to-End <span className="gradient-text">AI Pipeline</span>
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto">
+          <p className="text-sage-400 max-w-xl mx-auto">
             From raw RF simulation through GNN feature extraction to RL-driven tuning decisions,
             streamed live to the browser with cinematic slow-scan visualization.
           </p>
@@ -113,20 +113,20 @@ function ArchitectureSection() {
         <div className="flex flex-wrap justify-center items-center gap-4 md:gap-2">
           {ARCH_NODES.map((node, i) => {
             const colorMap = {
-              gold: 'border-gold-400/30 hover:border-gold-400/50',
-              flame: 'border-flame-400/30 hover:border-flame-400/50',
-              amber: 'border-amber-400/30 hover:border-amber-400/50',
-              crimson: 'border-crimson-400/30 hover:border-crimson-400/50',
+              teal: 'border-teal-400/30 hover:border-teal-400/50',
+              lime: 'border-lime-400/30 hover:border-lime-400/50',
+              sage: 'border-sage-400/30 hover:border-sage-400/50',
+              coral: 'border-coral-400/30 hover:border-coral-400/50',
             };
             return (
               <React.Fragment key={node.id}>
                 <div className={`arch-node ${colorMap[node.color]} min-w-[140px] animate-fade-in-up stagger-${i + 2}`}>
                   <div className="text-3xl mb-2">{node.icon}</div>
                   <div className="text-sm font-bold text-white">{node.label}</div>
-                  <div className="text-[10px] text-gray-500 font-mono uppercase tracking-wider mt-1">{node.sub}</div>
+                  <div className="text-[10px] text-sage-500 font-mono uppercase tracking-wider mt-1">{node.sub}</div>
                 </div>
                 {i < ARCH_NODES.length - 1 && (
-                  <div className="text-gold-400/60 text-lg font-mono hidden md:block">→</div>
+                  <div className="text-teal-400/60 text-lg font-mono hidden md:block">→</div>
                 )}
               </React.Fragment>
             );
@@ -142,16 +142,16 @@ export default function LandingPage() {
     <div className="min-h-screen">
       {/* ── Hero Section ── */}
       <section className="hero-gradient grid-pattern relative min-h-[85vh] flex items-center justify-center px-6">
-        {/* Floating orbs — warm palette */}
-        <div className="floating-orb w-96 h-96 bg-gold-400/10 top-20 -left-48" />
-        <div className="floating-orb w-72 h-72 bg-flame-400/10 bottom-20 -right-36" style={{ animationDelay: '5s' }} />
-        <div className="floating-orb w-48 h-48 bg-crimson-500/8 top-1/2 left-1/3" style={{ animationDelay: '10s' }} />
+        {/* Floating orbs */}
+        <div className="floating-orb w-96 h-96 bg-teal-400/10 top-20 -left-48" />
+        <div className="floating-orb w-72 h-72 bg-lime-400/8 bottom-20 -right-36" style={{ animationDelay: '5s' }} />
+        <div className="floating-orb w-48 h-48 bg-teal-500/6 top-1/2 left-1/3" style={{ animationDelay: '10s' }} />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-surface-500/40 bg-surface-800/40 backdrop-blur-sm mb-8 animate-fade-in-up stagger-1">
-            <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse" />
-            <span className="text-xs font-medium text-gray-300 uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-base-500/40 bg-base-800/40 backdrop-blur-sm mb-8 animate-fade-in-up stagger-1">
+            <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+            <span className="text-xs font-medium text-sage-300 uppercase tracking-wider">
               Smart Innovation Hackathon 2026 • SIH26055
             </span>
           </div>
@@ -164,9 +164,9 @@ export default function LandingPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up stagger-3">
+          <p className="text-lg md:text-xl text-sage-400 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up stagger-3">
             AI-powered Electronic Warfare Support system that intercepts fast-hopping
-            FHSS radio signals <strong className="text-gray-300">without prior intelligence</strong>,
+            FHSS radio signals <strong className="text-sage-200">without prior intelligence</strong>,
             using Graph Neural Networks and Reinforcement Learning.
           </p>
 
@@ -188,7 +188,7 @@ export default function LandingPage() {
             {TEAM_STATS.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl md:text-3xl font-bold text-white font-mono">{stat.value}</div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mt-1">{stat.label}</div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-sage-500 mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -199,13 +199,13 @@ export default function LandingPage() {
       <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 animate-fade-in-up">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-flame-400 mb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-lime-400 mb-3">
               Core Capabilities
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Powered by <span className="gradient-text">Advanced AI</span>
             </h2>
-            <p className="text-gray-400 max-w-xl mx-auto">
+            <p className="text-sage-400 max-w-xl mx-auto">
               Combining graph-based spectrum analysis with deep reinforcement learning
               for real-time adaptive electronic warfare support.
             </p>
@@ -226,7 +226,7 @@ export default function LandingPage() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-400 mb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sage-400 mb-3">
               Reward Engineering
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -237,40 +237,40 @@ export default function LandingPage() {
           <div className="glass-card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-surface-600/30">
-                  <th className="text-left px-6 py-4 text-gray-400 font-medium uppercase tracking-wider text-xs">Event</th>
-                  <th className="text-right px-6 py-4 text-gray-400 font-medium uppercase tracking-wider text-xs">Reward</th>
-                  <th className="text-left px-6 py-4 text-gray-400 font-medium uppercase tracking-wider text-xs hidden md:table-cell">Description</th>
+                <tr className="border-b border-base-600/30">
+                  <th className="text-left px-6 py-4 text-sage-400 font-medium uppercase tracking-wider text-xs">Event</th>
+                  <th className="text-right px-6 py-4 text-sage-400 font-medium uppercase tracking-wider text-xs">Reward</th>
+                  <th className="text-left px-6 py-4 text-sage-400 font-medium uppercase tracking-wider text-xs hidden md:table-cell">Description</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-surface-600/10 hover:bg-surface-700/20 transition-colors">
+                <tr className="border-b border-base-600/10 hover:bg-base-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-gold-400" /> Intercept Hit
+                    <span className="w-2 h-2 rounded-full bg-teal-400" /> Intercept Hit
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-gold-400 font-bold">+10.0</td>
-                  <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Tuned to active emitter channel</td>
+                  <td className="px-6 py-4 text-right font-mono text-teal-400 font-bold">+10.0</td>
+                  <td className="px-6 py-4 text-sage-400 hidden md:table-cell">Tuned to active emitter channel</td>
                 </tr>
-                <tr className="border-b border-surface-600/10 hover:bg-surface-700/20 transition-colors">
+                <tr className="border-b border-base-600/10 hover:bg-base-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-gray-500" /> Empty Scan
+                    <span className="w-2 h-2 rounded-full bg-sage-500" /> Empty Scan
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-crimson-400 font-bold">−1.0</td>
-                  <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Tuned to noise/inactive channel</td>
+                  <td className="px-6 py-4 text-right font-mono text-coral-400 font-bold">−1.0</td>
+                  <td className="px-6 py-4 text-sage-400 hidden md:table-cell">Tuned to noise/inactive channel</td>
                 </tr>
-                <tr className="border-b border-surface-600/10 hover:bg-surface-700/20 transition-colors">
+                <tr className="border-b border-base-600/10 hover:bg-base-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-crimson-500" /> Missed Active
+                    <span className="w-2 h-2 rounded-full bg-coral-400" /> Missed Active
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-crimson-400 font-bold">−5.0</td>
-                  <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Per missed active channel</td>
+                  <td className="px-6 py-4 text-right font-mono text-coral-400 font-bold">−5.0</td>
+                  <td className="px-6 py-4 text-sage-400 hidden md:table-cell">Per missed active channel</td>
                 </tr>
-                <tr className="hover:bg-surface-700/20 transition-colors">
+                <tr className="hover:bg-base-700/20 transition-colors">
                   <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-flame-400" /> Switching Cost
+                    <span className="w-2 h-2 rounded-full bg-lime-400" /> Switching Cost
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-flame-400 font-bold">−0.3·|Δf|</td>
-                  <td className="px-6 py-4 text-gray-400 hidden md:table-cell">Tuning delay proportional to frequency distance</td>
+                  <td className="px-6 py-4 text-right font-mono text-lime-400 font-bold">−0.3·|Δf|</td>
+                  <td className="px-6 py-4 text-sage-400 hidden md:table-cell">Tuning delay proportional to frequency distance</td>
                 </tr>
               </tbody>
             </table>
@@ -285,7 +285,7 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold text-white mb-4">
               Ready to Intercept?
             </h2>
-            <p className="text-gray-400 mb-8 max-w-md mx-auto">
+            <p className="text-sage-400 mb-8 max-w-md mx-auto">
               Launch the real-time tactical dashboard and watch the AI agent
               intercept frequency-hopping signals in real time.
             </p>
@@ -300,17 +300,17 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-surface-600/20 py-8 px-6">
+      <footer className="border-t border-base-600/20 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-gold-400 to-flame-400 flex items-center justify-center">
-              <span className="text-black font-bold text-xs">⚡</span>
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-teal-400 flex items-center justify-center">
+              <span className="text-base-900 font-bold text-xs">🛡️</span>
             </div>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-sage-500">
               Team HORIZON — Smart Innovation Hackathon 2026
             </span>
           </div>
-          <div className="text-xs text-gray-600 font-mono">
+          <div className="text-xs text-sage-600 font-mono">
             SIH26055 • Electronic Warfare Support System
           </div>
         </div>
