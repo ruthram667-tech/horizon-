@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/smart-scan-ew/dashboard/index.html",
+      "permanent": false
+    }
+  ]
+}
