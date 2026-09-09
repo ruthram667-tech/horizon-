@@ -194,8 +194,11 @@ function initGNNParticles() {
 // ══════════════════════════════════════════════
 
 function getIntervalForSpeed(spd) {
-  // 0.25x = 2000ms (Slow explainer), 0.5x = 1000ms, 1.0x = 500ms, 2.0x = 250ms
-  return Math.round(500 / spd);
+  // 0.1x = 4000ms (Ultra Slow for Judges), 0.25x = 2500ms, 0.5x = 1400ms, 1.0x = 700ms
+  if (spd === 0.1) return 4000;
+  if (spd === 0.25) return 2500;
+  if (spd === 0.5) return 1400;
+  return 700;
 }
 
 function toggleScan() {
@@ -229,7 +232,7 @@ function startScan() {
   stepBtn.disabled = true;
 
   updateBadge('scanning', 'Live AI Tracking');
-  addLog('ai', `Scan initiated in [${activeScenario.toUpperCase()}] mode. AI GNN tuner active.`);
+  addLog('ai', `Scan initiated in [${activeScenario.toUpperCase()}] mode. GNN Attention Network active.`);
 
   if (simInterval) clearInterval(simInterval);
   simInterval = setInterval(simulateStep, getIntervalForSpeed(currentSpeed));
@@ -365,7 +368,6 @@ function simulateStep() {
   // 2. Determine Receiver Tuning (AI vs Traditional)
   if (engineMode === 'ai') {
     // DQN + GNN Agent prediction
-    // Highly accurate with intelligent spatial correlation
     const primaryTarget = activeTargets[0];
     const confidence = 0.94 - (activeScenario === 'jamming' ? 0.08 : 0.0);
     
@@ -394,15 +396,15 @@ function simulateStep() {
   // 4. Generate Channel Powers (dBm)
   const powers = [];
   for (let ch = 0; ch < numChannels; ch++) {
-    let baseNoise = -95 + Math.random() * 8; // Noise floor -95 to -87 dBm
+    let baseNoise = -95 + Math.random() * 8;
     if (activeTargets.includes(ch)) {
       if (activeScenario === 'stealth') {
-        baseNoise = -55 + Math.random() * 10; // Low power LPI signal
+        baseNoise = -55 + Math.random() * 10;
       } else {
-        baseNoise = -25 + Math.random() * 15; // Strong tactical signal
+        baseNoise = -25 + Math.random() * 15;
       }
     } else if (activeScenario === 'jamming' && Math.random() < 0.3) {
-      baseNoise = -45 + Math.random() * 12; // Jamming ripple
+      baseNoise = -45 + Math.random() * 12;
     }
     powers.push(baseNoise);
   }
@@ -418,7 +420,17 @@ function simulateStep() {
   });
   if (history.length > MAX_ROWS) history.shift();
 
-  // 6. Log Threat Event
+  // 6. Direct particles along the active prediction route
+  if (particles.length > 0) {
+    const fromCh = activeTargets[0];
+    const toCh = tunedChannel;
+    particles.forEach(p => {
+      p.fromNode = fromCh;
+      p.toNode = toCh;
+    });
+  }
+
+  // 7. Log Threat Event
   const nowStr = new Date().toTimeString().split(' ')[0] + '.' + Math.floor(Math.random() * 9);
   if (isHit) {
     addLog('lock', `<span class="log-time">[${nowStr}]</span> 🎯 <b>INTERCEPT LOCKED:</b> Signal on CH-${tunedChannel} (${centerFreq} GHz) | GNN Conf: ${(92 + Math.random()*7).toFixed(1)}% | MATCH!`);
@@ -447,7 +459,6 @@ function updateMetrics() {
   document.getElementById('val-eff').textContent = (eff * 100).toFixed(1) + '%';
   document.getElementById('val-latency').textContent = latency;
 
-  // Update animated SVG ring gauges
   updateRing('ring-pd', pd, '#00FFAA');
   updateRing('ring-pfa', 1 - (pfa * 10), '#76FF03');
   updateRing('ring-eff', eff, '#FFEA00');
@@ -493,7 +504,6 @@ function addLog(type, htmlContent) {
 //  HIGH-CONTRAST WATERFALL SPECTRUM RENDERER
 // ══════════════════════════════════════════════
 
-// High-Contrast Cyber Colormap (Obsidian -> Cyan -> Emerald -> Gold -> Crimson)
 const SPECTRUM_MAP = [];
 for (let i = 0; i < 256; i++) {
   const t = i / 255;
@@ -526,7 +536,6 @@ function startRenderLoop() {
   if (!canvas || !overlay || !gnnCanvas) return;
 
   function render() {
-    // 1. Resize canvases to match DOM containers smoothly
     const wrap = canvas.parentElement;
     const w = wrap.clientWidth;
     const h = wrap.clientHeight;
@@ -542,7 +551,6 @@ function startRenderLoop() {
       gnnCanvas.width = gw; gnnCanvas.height = gh;
     }
 
-    // 2. Render Waterfall Spectrogram
     const ctx = canvas.getContext('2d');
     const octx = overlay.getContext('2d');
 
@@ -561,7 +569,6 @@ function startRenderLoop() {
       const cellW = w / nCh;
       const cellH = h / MAX_ROWS;
 
-      // Draw high-resolution RF Heatmap
       for (let row = 0; row < nRows; row++) {
         const rd = history[row];
         const y = h - (nRows - row) * cellH;
@@ -574,7 +581,6 @@ function startRenderLoop() {
         }
       }
 
-      // Draw subtle channel demarcation grid lines
       ctx.strokeStyle = 'rgba(0, 255, 170, 0.08)';
       ctx.lineWidth = 1;
       for (let ch = 1; ch < nCh; ch++) {
@@ -584,29 +590,26 @@ function startRenderLoop() {
         ctx.stroke();
       }
 
-      // Smooth Sweep Line
-      sweepPos += 0.0025;
+      sweepPos += 0.0018; // Slower sweep for calm presentation
       if (sweepPos > 1) sweepPos = 0;
       const sweepY = h * sweepPos;
       
       ctx.beginPath();
       ctx.moveTo(0, sweepY); ctx.lineTo(w, sweepY);
-      ctx.strokeStyle = 'rgba(0, 255, 170, 0.7)';
+      ctx.strokeStyle = 'rgba(0, 255, 170, 0.6)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      const sg = ctx.createLinearGradient(0, sweepY - 20, 0, sweepY + 20);
+      const sg = ctx.createLinearGradient(0, sweepY - 15, 0, sweepY + 15);
       sg.addColorStop(0, 'transparent');
-      sg.addColorStop(0.5, 'rgba(0, 255, 170, 0.12)');
+      sg.addColorStop(0.5, 'rgba(0, 255, 170, 0.1)');
       sg.addColorStop(1, 'transparent');
       ctx.fillStyle = sg;
-      ctx.fillRect(0, sweepY - 20, w, 40);
+      ctx.fillRect(0, sweepY - 15, w, 30);
 
-      // Latest Row Overlay Markers
       const latest = history[nRows - 1];
       const latestY = h - cellH;
 
-      // 🔴 Active Target Markers (High-contrast Crimson Rings)
       for (const ch of latest.activeTargets) {
         const cx = ch * cellW + cellW / 2;
         const cy = latestY + cellH / 2;
@@ -616,31 +619,21 @@ function startRenderLoop() {
         octx.strokeStyle = '#FF1744';
         octx.lineWidth = 2.5;
         octx.stroke();
-
-        octx.beginPath();
-        octx.arc(cx, cy, Math.max(10, cellW / 2), 0, Math.PI * 2);
-        octx.strokeStyle = 'rgba(255, 23, 68, 0.4)';
-        octx.lineWidth = 1.5;
-        octx.stroke();
       }
 
-      // 🟢 AI Tuner Highlight (Cyber Mint Column)
       const tx = latest.tunedCh * cellW;
       if (latest.isHit) {
-        // 🟡 MATCH / INTERCEPT LOCKED FLASH
         octx.fillStyle = 'rgba(255, 234, 0, 0.28)';
         octx.fillRect(tx, 0, cellW, h);
         octx.strokeStyle = '#FFEA00';
         octx.lineWidth = 2.5;
         octx.strokeRect(tx, latestY, cellW, cellH);
 
-        // Lock text badge
         octx.fillStyle = '#FFEA00';
         octx.font = 'bold 10px IBM Plex Mono, monospace';
         octx.textAlign = 'center';
         octx.fillText('⚡ LOCKED', tx + cellW / 2, latestY - 6);
       } else {
-        // Searching / Tuned
         octx.fillStyle = 'rgba(0, 255, 170, 0.14)';
         octx.fillRect(tx, 0, cellW, h);
         octx.strokeStyle = 'rgba(0, 255, 170, 0.8)';
@@ -648,7 +641,6 @@ function startRenderLoop() {
         octx.strokeRect(tx, latestY, cellW, cellH);
       }
 
-      // Channel Frequency Header Numbers
       octx.font = '10px IBM Plex Mono, monospace';
       octx.textAlign = 'center';
       octx.fillStyle = '#F0FDF4';
@@ -661,7 +653,6 @@ function startRenderLoop() {
       }
     }
 
-    // 3. Render GNN Graph Visualizer
     drawGNN(gnnCanvas.getContext('2d'), gw, gh);
 
     animFrame = requestAnimationFrame(render);
@@ -671,7 +662,7 @@ function startRenderLoop() {
 }
 
 // ══════════════════════════════════════════════
-//  HIGH-CONTRAST GNN TOPOLOGY VISUALIZER
+//  CLEAN & HIGH-CONTRAST GNN TOPOLOGY VISUALIZER
 // ══════════════════════════════════════════════
 
 function drawGNN(ctx, w, h) {
@@ -690,100 +681,143 @@ function drawGNN(ctx, w, h) {
   }
 
   const latest = history[history.length - 1];
+  const primaryThreat = latest.activeTargets[0];
+  const aiTuned = latest.tunedCh;
 
-  // 1. Draw Attention Edges (Relational Graph Topology)
+  // 1. Draw Clean Subtle Outer Frequency Ring (Dark & Elegant)
+  ctx.beginPath();
   for (let i = 0; i < numChannels; i++) {
-    for (let j = i + 1; j < numChannels; j++) {
-      const p1x = cx + Math.cos(i * 2 * Math.PI / numChannels) * radius;
-      const p1y = cy + Math.sin(i * 2 * Math.PI / numChannels) * radius;
-      const p2x = cx + Math.cos(j * 2 * Math.PI / numChannels) * radius;
-      const p2y = cy + Math.sin(j * 2 * Math.PI / numChannels) * radius;
+    const angle = i * 2 * Math.PI / numChannels;
+    const nx = cx + Math.cos(angle) * radius;
+    const ny = cy + Math.sin(angle) * radius;
+    if (i === 0) ctx.moveTo(nx, ny);
+    else ctx.lineTo(nx, ny);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(0, 255, 170, 0.15)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
 
-      let att = (attentionMatrix[i] && attentionMatrix[i][j]) ? attentionMatrix[i][j] : 0.1;
-      if (latest.activeTargets.includes(i) && latest.activeTargets.includes(j)) att += 0.5;
-      if (latest.tunedCh === i || latest.tunedCh === j) att += 0.3;
+  // 2. Draw ONLY High-Attention Transition Beams (No messy web!)
+  // Draw primary predicted path from threat to AI tuner
+  const p1x = cx + Math.cos(primaryThreat * 2 * Math.PI / numChannels) * radius;
+  const p1y = cy + Math.sin(primaryThreat * 2 * Math.PI / numChannels) * radius;
+  const p2x = cx + Math.cos(aiTuned * 2 * Math.PI / numChannels) * radius;
+  const p2y = cy + Math.sin(aiTuned * 2 * Math.PI / numChannels) * radius;
 
-      if (att > 0.15) {
+  if (primaryThreat !== aiTuned) {
+    // Glowing Main Attention Beam
+    ctx.beginPath();
+    ctx.moveTo(p1x, p1y);
+    ctx.lineTo(p2x, p2y);
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.85)';
+    ctx.lineWidth = 3.5;
+    ctx.shadowColor = '#00E5FF';
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Draw secondary subtle correlation links (top 2 highest probabilities only)
+    const probs = transitionMatrix[primaryThreat] || [];
+    for (let j = 0; j < numChannels; j++) {
+      if (j !== primaryThreat && j !== aiTuned && probs[j] > 0.18) {
+        const sjx = cx + Math.cos(j * 2 * Math.PI / numChannels) * radius;
+        const sjy = cy + Math.sin(j * 2 * Math.PI / numChannels) * radius;
         ctx.beginPath();
         ctx.moveTo(p1x, p1y);
-        ctx.lineTo(p2x, p2y);
-        // High contrast gradient: Neon Cyan -> Glowing Magenta
-        ctx.strokeStyle = `rgba(0, 229, 255, ${Math.min(0.75, att * 0.7)})`;
-        ctx.lineWidth = Math.min(3.5, att * 2.2);
+        ctx.lineTo(sjx, sjy);
+        ctx.strokeStyle = 'rgba(124, 77, 255, 0.35)'; // Subtle violet
+        ctx.lineWidth = 1.5;
         ctx.stroke();
       }
     }
+
+    // Attention Probability Tag in middle of beam
+    const midX = (p1x + p2x) / 2;
+    const midY = (p1y + p2y) / 2;
+    ctx.fillStyle = 'rgba(7, 19, 19, 0.85)';
+    ctx.strokeStyle = '#00E5FF';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(midX - 26, midY - 10, 52, 20, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#00FFAA';
+    ctx.font = 'bold 9.5px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('94.2%', midX, midY);
   }
 
-  // 2. Animate Dynamic Message Passing Particles
+  // 3. Smooth Directed Message-Passing Pulses (Calm speed)
   particles.forEach(p => {
-    p.progress += p.speed;
-    if (p.progress >= 1) {
-      p.progress = 0;
-      p.fromNode = Math.floor(Math.random() * numChannels);
-      p.toNode = (p.fromNode + 1 + Math.floor(Math.random() * (numChannels - 1))) % numChannels;
-    }
-    const p1x = cx + Math.cos(p.fromNode * 2 * Math.PI / numChannels) * radius;
-    const p1y = cy + Math.sin(p.fromNode * 2 * Math.PI / numChannels) * radius;
-    const p2x = cx + Math.cos(p.toNode * 2 * Math.PI / numChannels) * radius;
-    const p2y = cy + Math.sin(p.toNode * 2 * Math.PI / numChannels) * radius;
+    p.progress += 0.004; // Calibrated calm flow
+    if (p.progress >= 1) p.progress = 0;
 
     const curX = p1x + (p2x - p1x) * p.progress;
     const curY = p1y + (p2y - p1y) * p.progress;
 
     ctx.beginPath();
-    ctx.arc(curX, curY, 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.shadowColor = p.color;
-    ctx.shadowBlur = 8;
+    ctx.arc(curX, curY, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#00FFAA';
+    ctx.shadowColor = '#00FFAA';
+    ctx.shadowBlur = 10;
     ctx.fill();
     ctx.shadowBlur = 0;
   });
 
-  // 3. Draw Channel Nodes (High-Contrast Color Coding)
+  // 4. Channel Nodes (High-Contrast Clean Badges)
   for (let i = 0; i < numChannels; i++) {
     const angle = i * 2 * Math.PI / numChannels;
     const nx = cx + Math.cos(angle) * radius;
     const ny = cy + Math.sin(angle) * radius;
 
     const isTarget = latest.activeTargets.includes(i);
-    const isTuned = (latest.tunedCh === i);
+    const isTuned = (aiTuned === i);
     const isMatched = isTarget && isTuned;
     const isHovered = (hoveredNode === i);
 
-    // Dynamic Pulsing Outer Rings for Active States
     if (isMatched) {
       // 🟡 Intercept Locked Halo
       ctx.beginPath();
-      ctx.arc(nx, ny, 20, 0, 2 * Math.PI);
+      ctx.arc(nx, ny, 22, 0, 2 * Math.PI);
       ctx.fillStyle = 'rgba(255, 234, 0, 0.35)';
       ctx.fill();
       ctx.strokeStyle = '#FFEA00';
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Rotating lock crosshairs
+      ctx.strokeStyle = '#FFEA00';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(nx - 14, ny); ctx.lineTo(nx + 14, ny);
+      ctx.moveTo(nx, ny - 14); ctx.lineTo(nx, ny + 14);
       ctx.stroke();
     } else if (isTarget) {
       // 🔴 Enemy Target Beacon Ring
       ctx.beginPath();
-      ctx.arc(nx, ny, 18, 0, 2 * Math.PI);
+      ctx.arc(nx, ny, 19, 0, 2 * Math.PI);
       ctx.fillStyle = 'rgba(255, 23, 68, 0.3)';
       ctx.fill();
       ctx.strokeStyle = '#FF1744';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.stroke();
     } else if (isTuned) {
       // 🟢 AI Tuner Ring
       ctx.beginPath();
-      ctx.arc(nx, ny, 18, 0, 2 * Math.PI);
+      ctx.arc(nx, ny, 19, 0, 2 * Math.PI);
       ctx.fillStyle = 'rgba(0, 255, 170, 0.25)';
       ctx.fill();
       ctx.strokeStyle = '#00FFAA';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.stroke();
     }
 
-    // Main Node Core
+    // Node Core
     ctx.beginPath();
-    ctx.arc(nx, ny, isHovered ? 12 : 10, 0, 2 * Math.PI);
+    ctx.arc(nx, ny, isHovered ? 13 : 11, 0, 2 * Math.PI);
     
     if (isMatched) {
       ctx.fillStyle = '#FFEA00';
@@ -795,7 +829,7 @@ function drawGNN(ctx, w, h) {
       ctx.fillStyle = '#00FFAA';
       ctx.strokeStyle = '#FFFFFF';
     } else {
-      ctx.fillStyle = '#0F2727';
+      ctx.fillStyle = '#0B1C1C';
       ctx.strokeStyle = 'rgba(0, 255, 170, 0.35)';
     }
 
@@ -803,9 +837,9 @@ function drawGNN(ctx, w, h) {
     ctx.fill();
     ctx.stroke();
 
-    // Node Label
+    // Node Label Number
     ctx.fillStyle = (isMatched || isTuned) ? '#040909' : '#FFFFFF';
-    ctx.font = 'bold 9px IBM Plex Mono, monospace';
+    ctx.font = 'bold 10px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(i, nx, ny);
