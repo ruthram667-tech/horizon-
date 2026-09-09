@@ -8,8 +8,17 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Space Grotesk', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['IBM Plex Mono', 'Fira Code', 'monospace'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+      },
+      letterSpacing: {
+        tighter: '-0.04em',
+        tight: '-0.02em',
+        normal: '0',
+        wide: '0.03em',
+        wider: '0.06em',
+        widest: '0.12em',
       },
       colors: {
         teal: {

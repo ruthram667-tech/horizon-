@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ──────────────────────────────────────────────
-   Smart Scan EW — Design System v2 (Arctic Teal)
-   Palette: Teal / Mint / Coral / Lime on Deep Green-Charcoal
+   Smart Scan EW — Design System v3 (Bespoke Tactical Emerald & Obsidian)
+   Typography: Plus Jakarta Sans (Primary UI & Headings) + JetBrains Mono (Telemetry)
    ────────────────────────────────────────────── */
 
 * {
@@ -24,7 +24,7 @@
 
   --gradient-primary: linear-gradient(135deg, #0d9e80 0%, #2dd4a8 100%);
   --gradient-accent: linear-gradient(135deg, #2dd4a8 0%, #84cc16 100%);
-  --gradient-dark: linear-gradient(135deg, #060F0F 0%, #0A1A1A 40%, #0E2424 70%, #060F0F 100%);
+  --gradient-dark: linear-gradient(135deg, #040909 0%, #071313 40%, #0b1c1c 70%, #040909 100%);
   --gradient-coral: linear-gradient(135deg, #e8614d 0%, #d94a36 100%);
 
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -41,10 +41,17 @@ body {
   background: var(--gradient-dark);
   background-attachment: fixed;
   min-height: 100vh;
-  font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
   color: #E8F0EC;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
 }
 
 /* ──────────────────────────────────────────────
@@ -142,53 +149,59 @@ body {
   /* Stat values */
   .stat-value {
     @apply text-3xl font-bold font-mono tracking-tight;
-    text-shadow: 0 0 10px currentColor;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 16px currentColor;
   }
 
   .stat-value-lg {
-    @apply text-4xl font-bold font-mono tracking-tight;
-    text-shadow: 0 0 15px currentColor;
+    @apply text-4xl font-extrabold font-mono tracking-tight;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    text-shadow: 0 0 20px currentColor;
   }
 
   .stat-label {
-    @apply text-xs uppercase tracking-widest text-sage-400 mt-1 font-medium;
-    letter-spacing: 0.15em;
+    @apply text-[11px] uppercase tracking-wider text-sage-400 mt-1 font-semibold;
+    letter-spacing: 0.06em;
   }
 
   /* Buttons */
   .btn-tactical {
-    @apply px-6 py-2.5 rounded-xl font-semibold text-sm uppercase tracking-wider
+    @apply px-5 py-2 rounded-xl font-semibold text-xs uppercase tracking-wider
            transition-all duration-300 ease-out
            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-900;
+    letter-spacing: 0.05em;
   }
 
   .btn-start {
-    @apply btn-tactical text-base-900 font-bold;
+    @apply btn-tactical text-base-950 font-bold;
     background: linear-gradient(135deg, #2dd4a8, #51f7da);
-    box-shadow: 0 0 15px rgba(45, 212, 168, 0.3);
+    box-shadow: 0 0 15px rgba(45, 212, 168, 0.35);
   }
 
   .btn-start:hover {
-    box-shadow: 0 0 25px rgba(45, 212, 168, 0.55);
+    box-shadow: 0 0 25px rgba(45, 212, 168, 0.6);
     transform: translateY(-1px);
     background: linear-gradient(135deg, #51f7da, #90ffe9);
   }
 
   .btn-stop {
-    @apply btn-tactical text-white;
+    @apply btn-tactical text-white font-bold;
     background: linear-gradient(135deg, #e8614d, #d94a36);
-    box-shadow: 0 0 15px rgba(232, 97, 77, 0.3);
+    box-shadow: 0 0 15px rgba(232, 97, 77, 0.35);
   }
 
   .btn-stop:hover {
-    box-shadow: 0 0 25px rgba(232, 97, 77, 0.5);
+    box-shadow: 0 0 25px rgba(232, 97, 77, 0.6);
     transform: translateY(-1px);
     background: linear-gradient(135deg, #fbaba2, #e8614d);
   }
 
   .btn-primary {
-    @apply px-8 py-3 rounded-xl font-semibold text-sm uppercase tracking-wider text-base-900
+    @apply px-7 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-base-950
            transition-all duration-300 ease-out relative overflow-hidden;
+    letter-spacing: 0.06em;
     background: linear-gradient(135deg, #0d9e80, #2dd4a8);
     box-shadow: 0 4px 20px rgba(45, 212, 168, 0.25);
   }
@@ -203,8 +216,9 @@ body {
   }
 
   .btn-secondary {
-    @apply px-8 py-3 rounded-xl font-semibold text-sm uppercase tracking-wider
+    @apply px-7 py-3 rounded-xl font-semibold text-xs uppercase tracking-wider
            transition-all duration-300 ease-out border border-base-500/40 text-sage-300;
+    letter-spacing: 0.05em;
     background: rgba(14, 36, 36, 0.6);
     backdrop-filter: blur(10px);
   }
@@ -300,8 +314,8 @@ body {
 }
 
 .input-field {
-  @apply w-full bg-base-700/50 border border-base-600/40 rounded-xl px-4 py-3
-         text-sm font-mono
+  @apply w-full bg-base-800/60 border border-base-600/40 rounded-xl px-4 py-3
+         text-sm font-sans font-medium tracking-normal
          focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500/40
          transition-all duration-200 placeholder-sage-500;
   color: #E8F0EC;

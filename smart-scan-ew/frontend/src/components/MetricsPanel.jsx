@@ -81,53 +81,66 @@ export default function MetricsPanel({ data }) {
   const efficiency = totalHops > 0 ? (totalHits / totalHops) : 0;
 
   return (
-    <div className="glass-card px-4 py-3">
-      <div className="grid grid-cols-4 gap-4">
+    <div className="glass-card px-5 py-3 border border-base-600/30">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Detection Probability */}
         <div className="flex items-center gap-3 group">
-          <MiniRingGauge value={pd} size={38} strokeWidth={3} color="#2dd4a8" />
+          <MiniRingGauge value={pd} size={38} strokeWidth={3.5} color="#2dd4a8" />
           <div>
-            <div className="text-lg font-bold font-mono text-teal-400" style={{ textShadow: '0 0 8px rgba(45,212,168,0.3)' }}>
+            <div className="text-lg font-bold font-mono text-teal-300 tabular-nums tracking-tight">
               <AnimatedNumber value={pd * 100} decimals={1} suffix="%" />
             </div>
-            <div className="text-[10px] uppercase tracking-widest text-sage-500 font-medium">Detection P<sub>d</sub></div>
+            <div className="text-[10px] uppercase tracking-wider text-sage-400 font-semibold">
+              Detection Rate P<sub>d</sub>
+            </div>
           </div>
         </div>
 
         {/* False Alarm Rate */}
         <div className="flex items-center gap-3 group">
-          <MiniRingGauge value={1 - pfa} size={38} strokeWidth={3} color="#84cc16" />
+          <MiniRingGauge value={1 - pfa} size={38} strokeWidth={3.5} color="#84cc16" />
           <div>
-            <div className="text-lg font-bold font-mono text-lime-400" style={{ textShadow: '0 0 8px rgba(132,204,22,0.3)' }}>
+            <div className="text-lg font-bold font-mono text-lime-400 tabular-nums tracking-tight">
               <AnimatedNumber value={pfa * 100} decimals={2} suffix="%" />
             </div>
-            <div className="text-[10px] uppercase tracking-widest text-sage-500 font-medium">False Alarm P<sub>fa</sub></div>
+            <div className="text-[10px] uppercase tracking-wider text-sage-400 font-semibold">
+              False Alarm P<sub>fa</sub>
+            </div>
           </div>
         </div>
 
         {/* Total Intercepts */}
         <div className="flex items-center gap-3 group">
-          <div className="w-[38px] h-[38px] rounded-full bg-teal-400/10 flex items-center justify-center text-lg">
-            🎯
+          <div className="w-[38px] h-[38px] rounded-xl bg-teal-400/10 border border-teal-400/20 flex items-center justify-center text-teal-300">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" opacity="0.3" />
+              <line x1="22" y1="12" x2="18" y2="12" />
+              <line x1="6" y1="12" x2="2" y2="12" />
+              <line x1="12" y1="6" x2="12" y2="2" />
+              <line x1="12" y1="22" x2="12" y2="18" />
+              <circle cx="12" cy="12" r="2" fill="currentColor" />
+            </svg>
           </div>
           <div>
-            <div className="text-lg font-bold font-mono text-white">
-              {totalHits}
+            <div className="text-lg font-bold font-mono text-white tabular-nums tracking-tight">
+              {totalHits} <span className="text-xs font-normal text-sage-500">/ {totalHops}</span>
             </div>
-            <div className="text-[10px] uppercase tracking-widest text-sage-500 font-medium">
-              Intercepts <span className="text-sage-600">/ {totalHops}</span>
+            <div className="text-[10px] uppercase tracking-wider text-sage-400 font-semibold">
+              Interceptions
             </div>
           </div>
         </div>
 
         {/* Tuner Efficiency */}
         <div className="flex items-center gap-3 group">
-          <MiniRingGauge value={efficiency} size={38} strokeWidth={3} color="#e8614d" />
+          <MiniRingGauge value={efficiency} size={38} strokeWidth={3.5} color="#e8614d" />
           <div>
-            <div className="text-lg font-bold font-mono text-coral-400" style={{ textShadow: '0 0 8px rgba(232,97,77,0.3)' }}>
+            <div className="text-lg font-bold font-mono text-coral-400 tabular-nums tracking-tight">
               <AnimatedNumber value={efficiency * 100} decimals={1} suffix="%" />
             </div>
-            <div className="text-[10px] uppercase tracking-widest text-sage-500 font-medium">Efficiency</div>
+            <div className="text-[10px] uppercase tracking-wider text-sage-400 font-semibold">
+              Spectral Efficiency
+            </div>
           </div>
         </div>
       </div>

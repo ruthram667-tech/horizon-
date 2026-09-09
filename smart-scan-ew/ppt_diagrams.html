@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <title>Simple PPT Diagrams</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
     body {
       background-color: #0A1A1A;
       color: #E8F0EC;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       margin: 0; padding: 40px;
+      -webkit-font-smoothing: antialiased;
     }
     h1 { text-align: center; color: #2dd4a8; margin-bottom: 60px; font-size: 32px; }
     
@@ -236,7 +237,7 @@
   <script>
     const ctxOld = document.getElementById('chartOld').getContext('2d');
     const ctxNew = document.getElementById('chartNew').getContext('2d');
-    
+
     // Gradient for our AI line
     const gradientAI = ctxNew.createLinearGradient(0, 0, 0, 300);
     gradientAI.addColorStop(0, 'rgba(45, 212, 168, 0.5)'); // Mint Green
@@ -248,12 +249,12 @@
       plugins: { legend: { display: false } },
       scales: {
         x: {
-          title: { display: true, text: 'Time (Minutes)', color: '#7a9a8e', font: { family: 'Space Grotesk', size: 12 } },
+          title: { display: true, text: 'Time (Minutes)', color: '#7a9a8e', font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } },
           ticks: { color: '#7a9a8e' },
           grid: { color: '#1a3c3c' }
         },
         y: {
-          title: { display: true, text: 'Detection Probability (%)', color: '#7a9a8e', font: { family: 'Space Grotesk', size: 12 } },
+          title: { display: true, text: 'Detection Probability (%)', color: '#7a9a8e', font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } },
           ticks: { color: '#7a9a8e', callback: function(value) { return value + '%'; } },
           grid: { color: '#1a3c3c' },
           min: 0,

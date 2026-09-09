@@ -138,30 +138,32 @@ export default function SignInPage({ onSignIn }) {
         {/* Header */}
         <div className="text-center mb-8">
           <ShieldIcon />
-          <h1 className="text-2xl font-bold text-white mt-4 tracking-tight">
+          <h1 className="text-2xl font-extrabold text-white mt-4 tracking-tight">
             Smart Scan EW
           </h1>
-          <p className="text-xs text-sage-400 uppercase tracking-[0.25em] mt-2">
-            Secure Access Portal
+          <p className="text-[11px] font-semibold text-teal-400 uppercase tracking-[0.2em] mt-1.5">
+            Tactical Node Authentication
           </p>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-teal-400/40 to-transparent mx-auto mt-4" />
+          <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-teal-400/50 to-transparent mx-auto mt-3 rounded-full" />
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Base Selector */}
           <div>
-            <label className="stat-label block mb-2">Military Base</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-sage-300 block mb-1.5">
+              Operating Station / Command Sector
+            </label>
             <select
               id="select-base"
               value={base}
               onChange={(e) => setBase(e.target.value)}
-              className="select-field"
+              className="select-field text-xs"
             >
-              <option value="">— Select Base —</option>
+              <option value="">— Select Station / Sector —</option>
               {MILITARY_BASES.map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.name} • {b.region}
+                  {b.name} ({b.region})
                 </option>
               ))}
             </select>
@@ -169,18 +171,20 @@ export default function SignInPage({ onSignIn }) {
 
           {/* Username */}
           <div>
-            <label className="stat-label block mb-2">Operator ID</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-sage-300 block mb-1.5">
+              Operator Identifier
+            </label>
             <div className="relative">
               <input
                 id="input-username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter operator ID"
-                className="input-field pl-10"
+                placeholder="Enter operator callsign"
+                className="input-field pl-10 text-xs"
                 autoComplete="username"
               />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
               </svg>
             </div>
@@ -188,7 +192,9 @@ export default function SignInPage({ onSignIn }) {
 
           {/* Password */}
           <div>
-            <label className="stat-label block mb-2">Access Key</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-sage-300 block mb-1.5">
+              Security Access Key
+            </label>
             <div className="relative">
               <input
                 id="input-password"
@@ -196,16 +202,16 @@ export default function SignInPage({ onSignIn }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter access key"
-                className="input-field pl-10 pr-10"
+                className="input-field pl-10 pr-10 text-xs"
                 autoComplete="current-password"
               />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
               </svg>
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-sage-500 hover:text-teal-400 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sage-400 hover:text-teal-400 transition-colors"
               >
                 {showPassword ? (
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -223,7 +229,7 @@ export default function SignInPage({ onSignIn }) {
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-coral-400/10 border border-coral-400/20 text-coral-400 text-xs font-medium animate-fade-in">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-coral-400/10 border border-coral-400/25 text-coral-400 text-xs font-semibold animate-fade-in">
               <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
               </svg>
@@ -236,7 +242,7 @@ export default function SignInPage({ onSignIn }) {
             id="btn-sign-in"
             type="submit"
             disabled={loading}
-            className={`w-full btn-primary flex items-center justify-center gap-2 py-3.5 ${loading ? 'opacity-60 cursor-wait' : ''}`}
+            className={`w-full btn-primary flex items-center justify-center gap-2 py-3 mt-2 ${loading ? 'opacity-60 cursor-wait' : ''}`}
           >
             {loading ? (
               <>
@@ -244,28 +250,31 @@ export default function SignInPage({ onSignIn }) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Authenticating...
+                Authenticating Credentials...
               </>
             ) : (
               <>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
-                Authorize Access
+                Authenticate & Connect
               </>
             )}
           </button>
         </form>
 
-        {/* Footer */}
-        <div className="mt-8 pt-5 border-t border-base-600/30">
-          <div className="flex items-center justify-between text-[10px] text-sage-500 uppercase tracking-wider">
+        {/* Footer with Demo Access info */}
+        <div className="mt-7 pt-4 border-t border-base-600/30">
+          <div className="flex items-center justify-between text-[11px] text-sage-400 font-medium">
             <span>Team HORIZON</span>
-            <span>SIH26055</span>
+            <span className="font-mono text-teal-400/80">SIH26055</span>
           </div>
-          <p className="text-[10px] text-sage-600 text-center mt-2">
-            Demo: operator / smartscan
-          </p>
+          <div className="mt-3 p-2 rounded-lg bg-base-900/60 border border-base-600/30 flex items-center justify-between text-[11px]">
+            <span className="text-sage-400">Quick Demo Access:</span>
+            <span className="font-mono text-teal-300 font-medium bg-teal-400/10 px-2 py-0.5 rounded border border-teal-400/20">
+              operator / smartscan
+            </span>
+          </div>
         </div>
       </div>
     </div>

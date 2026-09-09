@@ -579,7 +579,7 @@ function startRenderLoop() {
 
     if (history.length === 0) {
       ctx.fillStyle = '#577B6E';
-      ctx.font = '14px Space Grotesk, sans-serif';
+      ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Press START SCAN to activate tactical RF sensor...', w / 2, h / 2);
     } else {
@@ -649,7 +649,7 @@ function startRenderLoop() {
         octx.strokeRect(tx, latestY, cellW, cellH);
 
         octx.fillStyle = '#FFEA00';
-        octx.font = 'bold 10px IBM Plex Mono, monospace';
+        octx.font = 'bold 10px "JetBrains Mono", monospace';
         octx.textAlign = 'center';
         octx.fillText('⚡ LOCKED', tx + cellW / 2, latestY - 6);
       } else {
@@ -660,7 +660,7 @@ function startRenderLoop() {
         octx.strokeRect(tx, latestY, cellW, cellH);
       }
 
-      octx.font = '10px IBM Plex Mono, monospace';
+      octx.font = '500 10px "JetBrains Mono", monospace';
       octx.textAlign = 'center';
       octx.fillStyle = '#F0FDF4';
       for (let ch = 0; ch < nCh; ch++) {
@@ -693,7 +693,7 @@ function drawGNN(ctx, w, h) {
 
   if (history.length === 0) {
     ctx.fillStyle = '#577B6E';
-    ctx.font = '12px Space Grotesk, sans-serif';
+    ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Awaiting scan initialization...', cx, cy);
     return;
@@ -802,7 +802,7 @@ function drawGNN(ctx, w, h) {
   ctx.stroke();
 
   ctx.fillStyle = '#00FFAA';
-  ctx.font = 'bold 10px IBM Plex Mono, monospace';
+  ctx.font = 'bold 10px "JetBrains Mono", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('94.8%', midX, midY);
@@ -879,7 +879,7 @@ function drawGNN(ctx, w, h) {
 
     // Node Label Number
     ctx.fillStyle = (isCurrentThreat && isLock) || isPredictedNext ? '#040909' : '#FFFFFF';
-    ctx.font = 'bold 10px IBM Plex Mono, monospace';
+    ctx.font = 'bold 10px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(i, nx, ny);

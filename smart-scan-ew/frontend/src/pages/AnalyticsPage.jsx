@@ -145,89 +145,93 @@ export default function AnalyticsPage({ data }) {
   const episodeReward = data?.episode_reward ?? 0;
 
   return (
-    <div className="min-h-[calc(100vh-57px)] p-6 animate-fade-in">
+    <div className="min-h-[calc(100vh-57px)] p-6 md:p-8 animate-fade-in">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white mb-2">Analytics</h1>
-          <p className="text-sm text-sage-400">Real-time performance metrics and historical trends</p>
+          <h1 className="text-2xl font-extrabold text-white mb-1.5 tracking-tight">
+            Mission Telemetry & Analytics
+          </h1>
+          <p className="text-xs text-sage-300 font-medium">
+            Real-time interception convergence curves, probability metrics, and RL reward trends
+          </p>
         </div>
 
         {/* Ring Gauges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div className="glass-card p-6 flex items-center justify-center">
-            <RingGauge value={pd} color="#2dd4a8" label="Detection Prob" sublabel="Pd" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+          <div className="glass-card p-6 flex items-center justify-center border border-base-600/30">
+            <RingGauge value={pd} color="#2dd4a8" label="Detection Rate" sublabel="Empirical Pd" />
           </div>
-          <div className="glass-card p-6 flex items-center justify-center">
-            <RingGauge value={1 - pfa} color="#84cc16" label="Accuracy" sublabel="1 - Pfa" />
+          <div className="glass-card p-6 flex items-center justify-center border border-base-600/30">
+            <RingGauge value={1 - pfa} color="#84cc16" label="Selectivity" sublabel="1 - Pfa Accuracy" />
           </div>
-          <div className="glass-card p-6 flex items-center justify-center">
-            <RingGauge value={efficiency} color="#e8614d" label="Efficiency" sublabel="Hits / Scans" />
+          <div className="glass-card p-6 flex items-center justify-center border border-base-600/30">
+            <RingGauge value={efficiency} color="#e8614d" label="Dwell Efficiency" sublabel="Hits / Dwell Cycles" />
           </div>
-          <div className="glass-card p-6 flex items-center justify-center">
-            <RingGauge value={Math.min(1, Math.max(0, episodeReward / 500))} color="#0d9e80" label="Reward" sublabel={`${episodeReward.toFixed(0)} pts`} />
+          <div className="glass-card p-6 flex items-center justify-center border border-base-600/30">
+            <RingGauge value={Math.min(1, Math.max(0, episodeReward / 500))} color="#0d9e80" label="Policy Return" sublabel={`${episodeReward.toFixed(0)} pts`} />
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
-            { label: 'Total Scans', value: totalHops.toLocaleString(), color: 'text-white' },
-            { label: 'Total Hits', value: totalHits.toLocaleString(), color: 'text-teal-400' },
-            { label: 'Total Misses', value: totalMisses.toLocaleString(), color: 'text-coral-400' },
-            { label: 'False Alarm', value: `${(pfa * 100).toFixed(2)}%`, color: 'text-lime-400' },
-            { label: 'Cumul. Reward', value: episodeReward.toFixed(0), color: 'text-sage-300' },
+            { label: 'Dwell Epochs', value: totalHops.toLocaleString(), color: 'text-white' },
+            { label: 'Confirmed Hits', value: totalHits.toLocaleString(), color: 'text-teal-300' },
+            { label: 'Target Misses', value: totalMisses.toLocaleString(), color: 'text-coral-400' },
+            { label: 'False Alarm Pfa', value: `${(pfa * 100).toFixed(2)}%`, color: 'text-lime-400' },
+            { label: 'Cumulative Reward', value: episodeReward.toFixed(0), color: 'text-sage-200' },
           ].map((stat) => (
-            <div key={stat.label} className="glass-card p-4 text-center">
-              <div className={`text-2xl font-bold font-mono ${stat.color}`}>{stat.value}</div>
-              <div className="stat-label">{stat.label}</div>
+            <div key={stat.label} className="glass-card p-4 text-center border border-base-600/30">
+              <div className={`text-2xl font-bold font-mono tracking-tight tabular-nums ${stat.color}`}>{stat.value}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-sage-400 mt-1.5">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Trend Charts */}
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-teal-400 mr-2">◆</span>Detection Probability Over Time
+          <div className="glass-card p-6 border border-base-600/30">
+            <h3 className="text-xs font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-2 h-2 rounded-sm bg-teal-400" />Detection Probability History (Pd)
             </h3>
             <SparklineChart values={pdHistory.length > 1 ? pdHistory : [0, 0]} color="#2dd4a8" width={500} height={100} />
-            <div className="flex justify-between mt-3 text-xs text-sage-500 font-mono">
-              <span>Start</span>
-              <span>Current: {(pd * 100).toFixed(1)}%</span>
+            <div className="flex justify-between mt-3 text-xs text-sage-400 font-mono tabular-nums">
+              <span>Epoch 0</span>
+              <span className="text-teal-300 font-medium">Current: {(pd * 100).toFixed(1)}%</span>
             </div>
           </div>
 
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-lime-400 mr-2">◆</span>False Alarm Rate Over Time
+          <div className="glass-card p-6 border border-base-600/30">
+            <h3 className="text-xs font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-2 h-2 rounded-sm bg-lime-400" />False Alarm Rate Convergence (Pfa)
             </h3>
             <SparklineChart values={pfaHistory.length > 1 ? pfaHistory : [0, 0]} color="#84cc16" width={500} height={100} />
-            <div className="flex justify-between mt-3 text-xs text-sage-500 font-mono">
-              <span>Start</span>
-              <span>Current: {(pfa * 100).toFixed(2)}%</span>
+            <div className="flex justify-between mt-3 text-xs text-sage-400 font-mono tabular-nums">
+              <span>Epoch 0</span>
+              <span className="text-lime-400 font-medium">Current: {(pfa * 100).toFixed(2)}%</span>
             </div>
           </div>
 
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-sage-400 mr-2">◆</span>Cumulative Hits
+          <div className="glass-card p-6 border border-base-600/30">
+            <h3 className="text-xs font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-2 h-2 rounded-sm bg-teal-300" />Cumulative Intercept Interceptions
             </h3>
             <SparklineChart values={hitsHistory.length > 1 ? hitsHistory : [0, 0]} color="#0d9e80" width={500} height={100} />
-            <div className="flex justify-between mt-3 text-xs text-sage-500 font-mono">
-              <span>Start</span>
-              <span>Total: {totalHits}</span>
+            <div className="flex justify-between mt-3 text-xs text-sage-400 font-mono tabular-nums">
+              <span>Epoch 0</span>
+              <span className="text-teal-300 font-medium">Total: {totalHits}</span>
             </div>
           </div>
 
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-              <span className="text-coral-400 mr-2">◆</span>Episode Reward
+          <div className="glass-card p-6 border border-base-600/30">
+            <h3 className="text-xs font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-2 h-2 rounded-sm bg-coral-400" />Episode Reward Trajectory
             </h3>
             <SparklineChart values={rewardHistory.length > 1 ? rewardHistory : [0, 0]} color="#e8614d" width={500} height={100} />
-            <div className="flex justify-between mt-3 text-xs text-sage-500 font-mono">
-              <span>Start</span>
-              <span>Current: {episodeReward.toFixed(0)}</span>
+            <div className="flex justify-between mt-3 text-xs text-sage-400 font-mono tabular-nums">
+              <span>Epoch 0</span>
+              <span className="text-coral-400 font-medium">Return: {episodeReward.toFixed(0)} pts</span>
             </div>
           </div>
         </div>

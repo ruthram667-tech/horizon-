@@ -239,8 +239,8 @@ export default function GNNVisualizer({ data }) {
       ctx.lineWidth = isTuned || isActive ? 2 : 1;
       ctx.stroke();
 
-      ctx.fillStyle = isTuned ? 'rgba(232, 240, 236, 0.95)' : 'rgba(232, 240, 236, 0.4)';
-      ctx.font = `${isTuned ? '600' : '400'} ${Math.max(8, nodeRadius * 0.8)}px IBM Plex Mono, monospace`;
+      ctx.fillStyle = isTuned ? 'rgba(232, 240, 236, 0.95)' : 'rgba(232, 240, 236, 0.45)';
+      ctx.font = `${isTuned ? '600' : '500'} ${Math.max(8, nodeRadius * 0.8)}px "JetBrains Mono", monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(`${i}`, node.x, node.y);
@@ -253,10 +253,10 @@ export default function GNNVisualizer({ data }) {
     const layerGap = diagramH / 3;
 
     const layers = [
-      { label: 'Input', sub: '[N×4]', y: diagramY },
-      { label: 'GAT L1', sub: '4-Head → 128D', y: diagramY + layerGap },
-      { label: 'GAT L2', sub: '1-Head → 32D', y: diagramY + layerGap * 2 },
-      { label: 'Output', sub: 'Embeddings', y: diagramY + layerGap * 3 },
+      { label: 'Input State', sub: '[N×4 Tensor]', y: diagramY },
+      { label: 'GAT Layer 1', sub: '4-Head → 128D', y: diagramY + layerGap },
+      { label: 'GAT Layer 2', sub: '1-Head → 32D', y: diagramY + layerGap * 2 },
+      { label: 'Latent Vector', sub: 'Channel Embed', y: diagramY + layerGap * 3 },
     ];
 
     for (let i = 0; i < layers.length - 1; i++) {
@@ -291,35 +291,35 @@ export default function GNNVisualizer({ data }) {
       const bx = diagramX - boxW / 2;
       const by = layer.y - boxH / 2;
 
-      ctx.fillStyle = 'rgba(10, 26, 26, 0.8)';
-      ctx.strokeStyle = 'rgba(45, 212, 168, 0.2)';
+      ctx.fillStyle = 'rgba(10, 26, 26, 0.85)';
+      ctx.strokeStyle = 'rgba(45, 212, 168, 0.25)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(bx, by, boxW, boxH, 6);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(232, 240, 236, 0.8)';
-      ctx.font = '600 10px Space Grotesk, sans-serif';
+      ctx.fillStyle = 'rgba(232, 240, 236, 0.9)';
+      ctx.font = '600 10px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(layer.label, diagramX, layer.y - 4);
 
-      ctx.fillStyle = 'rgba(45, 212, 168, 0.5)';
-      ctx.font = '9px IBM Plex Mono, monospace';
+      ctx.fillStyle = 'rgba(45, 212, 168, 0.7)';
+      ctx.font = '500 9px "JetBrains Mono", monospace';
       ctx.fillText(layer.sub, diagramX, layer.y + 7);
     }
 
     // Legend
     const legendX = 12;
     const legendY = h - 65;
-    ctx.font = '9px Space Grotesk, sans-serif';
+    ctx.font = '500 9px "Plus Jakarta Sans", sans-serif';
 
     const legendItems = [
-      { color: '#2dd4a8', label: 'Tuned' },
-      { color: '#84cc16', label: 'Hit' },
-      { color: '#e8614d', label: 'Active Target' },
-      { color: '#3a4a44', label: 'Idle' },
+      { color: '#2dd4a8', label: 'Receiver Tuned' },
+      { color: '#84cc16', label: 'Intercept Hit' },
+      { color: '#e8614d', label: 'Active Emitter' },
+      { color: '#3a4a44', label: 'Noise Dwell' },
     ];
 
     legendItems.forEach((item, idx) => {
@@ -328,17 +328,17 @@ export default function GNNVisualizer({ data }) {
       ctx.arc(legendX + 5, ly, 4, 0, TWO_PI);
       ctx.fillStyle = item.color;
       ctx.fill();
-      ctx.fillStyle = 'rgba(232, 240, 236, 0.45)';
+      ctx.fillStyle = 'rgba(232, 240, 236, 0.55)';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(item.label, legendX + 14, ly);
     });
 
-    ctx.fillStyle = 'rgba(232, 240, 236, 0.15)';
-    ctx.font = '600 9px Space Grotesk, sans-serif';
+    ctx.fillStyle = 'rgba(232, 240, 236, 0.3)';
+    ctx.font = '700 9px "Plus Jakarta Sans", sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText('GRAPH ATTENTION NETWORK', 10, 10);
+    ctx.fillText('GRAPH ATTENTION NETWORK TOPOLOGY', 10, 10);
 
     animRef.current = requestAnimationFrame(render);
   }, [data]);
@@ -351,17 +351,17 @@ export default function GNNVisualizer({ data }) {
   }, [render]);
 
   return (
-    <div className="glass-card p-3 h-full flex flex-col">
+    <div className="glass-card p-3.5 h-full flex flex-col border border-base-600/30">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-sage-300">
-          <span className="text-teal-400 mr-2">◆</span>
-          GNN Visualizer
+        <h2 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+          <span className="w-2 h-2 rounded-sm bg-teal-400 shadow-[0_0_6px_rgba(45,212,168,0.6)]" />
+          Graph Attention Visualizer
         </h2>
-        <span className="text-xs text-sage-500 font-mono">
-          {data?.channel_powers ? `${data.channel_powers.length} Nodes | 4-Head GAT` : '—'}
+        <span className="text-[11px] text-teal-300/80 font-mono tracking-wider bg-teal-400/10 px-2 py-0.5 rounded-full border border-teal-400/20">
+          {data?.channel_powers ? `${data.channel_powers.length} Nodes • 4-Head GAT` : '—'}
         </span>
       </div>
-      <div className="gnn-container flex-1 relative border border-base-600/20">
+      <div className="gnn-container flex-1 relative border border-base-600/30 rounded-xl overflow-hidden">
         <canvas ref={canvasRef} className="absolute inset-0" />
       </div>
     </div>

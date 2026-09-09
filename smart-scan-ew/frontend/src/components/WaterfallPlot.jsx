@@ -104,12 +104,12 @@ export default function WaterfallPlot({ data }) {
     }
 
     if (history.length === 0) {
-      ctx.fillStyle = '#0A1A1A';
+      ctx.fillStyle = '#040909';
       ctx.fillRect(0, 0, w, h);
       ctx.fillStyle = '#577b6e';
-      ctx.font = '14px Space Grotesk, sans-serif';
+      ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Waiting for scan data...', w / 2, h / 2);
+      ctx.fillText('Awaiting spectrum telemetry stream...', w / 2, h / 2);
       animFrameRef.current = requestAnimationFrame(render);
       return;
     }
@@ -120,7 +120,7 @@ export default function WaterfallPlot({ data }) {
     const cellHeight = h / MAX_ROWS;
 
     // ── Draw waterfall heatmap ──
-    ctx.fillStyle = '#0A1A1A';
+    ctx.fillStyle = '#040909';
     ctx.fillRect(0, 0, w, h);
 
     for (let row = 0; row < numRows; row++) {
@@ -207,24 +207,24 @@ export default function WaterfallPlot({ data }) {
       }
 
       // Channel labels at top
-      octx.font = '10px IBM Plex Mono, monospace';
+      octx.font = '500 10px "JetBrains Mono", monospace';
       octx.textAlign = 'center';
-      octx.fillStyle = 'rgba(232, 240, 236, 0.4)';
+      octx.fillStyle = 'rgba(232, 240, 236, 0.55)';
       for (let ch = 0; ch < numChannels; ch++) {
         octx.fillText(
-          `${ch}`,
+          `CH-${ch}`,
           ch * cellWidth + cellWidth / 2,
-          12
+          13
         );
       }
 
       // Y-axis time label
       octx.save();
-      octx.font = '9px Space Grotesk, sans-serif';
-      octx.fillStyle = 'rgba(232, 240, 236, 0.3)';
+      octx.font = '600 9px "Plus Jakarta Sans", sans-serif';
+      octx.fillStyle = 'rgba(232, 240, 236, 0.4)';
       octx.textAlign = 'left';
-      octx.fillText('← TIME', 4, h - 4);
-      octx.fillText('NOW →', 4, latestY - 2);
+      octx.fillText('HISTORICAL DWELL', 6, h - 6);
+      octx.fillText('CURRENT EPOCH →', 6, latestY - 4);
       octx.restore();
     }
 
@@ -239,17 +239,17 @@ export default function WaterfallPlot({ data }) {
   }, [render]);
 
   return (
-    <div className="glass-card p-4 h-full flex flex-col">
+    <div className="glass-card p-4 h-full flex flex-col border border-base-600/30">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-sage-300">
-          <span className="text-teal-400 mr-2">◆</span>
-          Waterfall Spectrogram
+        <h2 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+          <span className="w-2 h-2 rounded-sm bg-teal-400 shadow-[0_0_6px_rgba(45,212,168,0.6)]" />
+          Real-Time Waterfall Spectrogram
         </h2>
-        <span className="text-xs text-sage-500 font-mono">
-          {data ? `${data.channel_powers?.length || 0} CH` : '—'}
+        <span className="text-[11px] text-teal-300/80 font-mono tracking-wider bg-teal-400/10 px-2.5 py-0.5 rounded-full border border-teal-400/20">
+          {data ? `${data.channel_powers?.length || 0} Channels Monitored` : 'Waiting for telemetry'}
         </span>
       </div>
-      <div className="waterfall-container flex-1 relative rounded-xl overflow-hidden border border-base-600/20">
+      <div className="waterfall-container flex-1 relative rounded-xl overflow-hidden border border-base-600/30">
         <canvas ref={canvasRef} className="absolute inset-0" />
         <canvas ref={overlayCanvasRef} className="absolute inset-0" />
       </div>
