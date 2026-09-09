@@ -337,6 +337,12 @@ function setChannels(val) {
   addLog('ai', `Spectrum resolution set to ${numChannels} Channels (2.0–18.0 GHz).`);
 }
 
+// Target & Prediction State
+let prevTarget = 0;
+let currentTarget = 3;
+let predictedNext = 7;
+let hopStartTime = Date.now();
+
 function spawnTargets() {
   if (activeScenario === 'drone') {
     activeTargets = [2, Math.min(numChannels - 1, 6)];
@@ -345,6 +351,23 @@ function spawnTargets() {
   } else {
     activeTargets = [Math.floor(Math.random() * numChannels)];
   }
+  currentTarget = activeTargets[0];
+  prevTarget = (currentTarget + numChannels - 1) % numChannels;
+  computePredictedNext();
+  hopStartTime = Date.now();
+}
+
+function computePredictedNext() {
+  const probs = transitionMatrix[currentTarget] || [];
+  let bestCh = (currentTarget + 2) % numChannels;
+  let maxP = 0;
+  for (let j = 0; j < numChannels; j++) {
+    if (j !== currentTarget && (probs[j] || 0) > maxP) {
+      maxP = probs[j];
+      bestCh = j;
+    }
+  }
+  predictedNext = bestCh;
 }
 
 // ══════════════════════════════════════════════
@@ -353,6 +376,7 @@ function spawnTargets() {
 
 function simulateStep() {
   totalHops++;
+  prevTarget = currentTarget;
 
   // 1. Move active targets according to scenario Markov probabilities
   activeTargets = activeTargets.map(ch => {
@@ -365,23 +389,28 @@ function simulateStep() {
     return ch;
   });
 
+  currentTarget = activeTargets[0];
+
   // 2. Determine Receiver Tuning (AI vs Traditional)
   if (engineMode === 'ai') {
     // DQN + GNN Agent prediction
-    const primaryTarget = activeTargets[0];
     const confidence = 0.94 - (activeScenario === 'jamming' ? 0.08 : 0.0);
     
     if (Math.random() < confidence) {
-      tunedChannel = primaryTarget;
+      tunedChannel = currentTarget;
     } else {
       // Near-miss exploration
       const offset = Math.random() > 0.5 ? 1 : -1;
-      tunedChannel = Math.max(0, Math.min(numChannels - 1, primaryTarget + offset));
+      tunedChannel = Math.max(0, Math.min(numChannels - 1, currentTarget + offset));
     }
   } else {
     // Traditional linear sweeping receiver
     tunedChannel = (tunedChannel + 1) % numChannels;
   }
+
+  // Pre-calculate next predicted hop for the slow-moving pulse animation
+  computePredictedNext();
+  hopStartTime = Date.now();
 
   // 3. Evaluate Intercept
   isHit = activeTargets.includes(tunedChannel);
@@ -419,16 +448,6 @@ function simulateStep() {
     freq: centerFreq
   });
   if (history.length > MAX_ROWS) history.shift();
-
-  // 6. Direct particles along the active prediction route
-  if (particles.length > 0) {
-    const fromCh = activeTargets[0];
-    const toCh = tunedChannel;
-    particles.forEach(p => {
-      p.fromNode = fromCh;
-      p.toNode = toCh;
-    });
-  }
 
   // 7. Log Threat Event
   const nowStr = new Date().toTimeString().split(' ')[0] + '.' + Math.floor(Math.random() * 9);
@@ -681,10 +700,11 @@ function drawGNN(ctx, w, h) {
   }
 
   const latest = history[history.length - 1];
-  const primaryThreat = latest.activeTargets[0];
-  const aiTuned = latest.tunedCh;
+  const srcNode = currentTarget;
+  const dstNode = predictedNext;
+  const isLock = latest.isHit;
 
-  // 1. Draw Clean Subtle Outer Frequency Ring (Dark & Elegant)
+  // 1. Draw Clean Subtle Outer Frequency Ring (Perimeter)
   ctx.beginPath();
   for (let i = 0; i < numChannels; i++) {
     const angle = i * 2 * Math.PI / numChannels;
@@ -694,78 +714,98 @@ function drawGNN(ctx, w, h) {
     else ctx.lineTo(nx, ny);
   }
   ctx.closePath();
-  ctx.strokeStyle = 'rgba(0, 255, 170, 0.15)';
+  ctx.strokeStyle = 'rgba(0, 255, 170, 0.12)';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // 2. Draw ONLY High-Attention Transition Beams (No messy web!)
-  // Draw primary predicted path from threat to AI tuner
-  const p1x = cx + Math.cos(primaryThreat * 2 * Math.PI / numChannels) * radius;
-  const p1y = cy + Math.sin(primaryThreat * 2 * Math.PI / numChannels) * radius;
-  const p2x = cx + Math.cos(aiTuned * 2 * Math.PI / numChannels) * radius;
-  const p2y = cy + Math.sin(aiTuned * 2 * Math.PI / numChannels) * radius;
+  // 2. Draw Active Prediction Beam (From Current Emitter to Predicted Next Hop)
+  const p1x = cx + Math.cos(srcNode * 2 * Math.PI / numChannels) * radius;
+  const p1y = cy + Math.sin(srcNode * 2 * Math.PI / numChannels) * radius;
+  const p2x = cx + Math.cos(dstNode * 2 * Math.PI / numChannels) * radius;
+  const p2y = cy + Math.sin(dstNode * 2 * Math.PI / numChannels) * radius;
 
-  if (primaryThreat !== aiTuned) {
-    // Glowing Main Attention Beam
-    ctx.beginPath();
-    ctx.moveTo(p1x, p1y);
-    ctx.lineTo(p2x, p2y);
-    ctx.strokeStyle = 'rgba(0, 229, 255, 0.85)';
-    ctx.lineWidth = 3.5;
-    ctx.shadowColor = '#00E5FF';
-    ctx.shadowBlur = 12;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+  // Main Glowing Attention Vector
+  ctx.beginPath();
+  ctx.moveTo(p1x, p1y);
+  ctx.lineTo(p2x, p2y);
+  ctx.strokeStyle = 'rgba(0, 229, 255, 0.85)';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = '#00E5FF';
+  ctx.shadowBlur = 14;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
 
-    // Draw secondary subtle correlation links (top 2 highest probabilities only)
-    const probs = transitionMatrix[primaryThreat] || [];
-    for (let j = 0; j < numChannels; j++) {
-      if (j !== primaryThreat && j !== aiTuned && probs[j] > 0.18) {
-        const sjx = cx + Math.cos(j * 2 * Math.PI / numChannels) * radius;
-        const sjy = cy + Math.sin(j * 2 * Math.PI / numChannels) * radius;
-        ctx.beginPath();
-        ctx.moveTo(p1x, p1y);
-        ctx.lineTo(sjx, sjy);
-        ctx.strokeStyle = 'rgba(124, 77, 255, 0.35)'; // Subtle violet
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
+  // Secondary subtle transition probability line (top alternative hop)
+  const probs = transitionMatrix[srcNode] || [];
+  let altNode = (srcNode + 3) % numChannels;
+  let maxAlt = 0;
+  for (let j = 0; j < numChannels; j++) {
+    if (j !== srcNode && j !== dstNode && (probs[j] || 0) > maxAlt) {
+      maxAlt = probs[j];
+      altNode = j;
     }
+  }
+  const altX = cx + Math.cos(altNode * 2 * Math.PI / numChannels) * radius;
+  const altY = cy + Math.sin(altNode * 2 * Math.PI / numChannels) * radius;
+  ctx.beginPath();
+  ctx.moveTo(p1x, p1y);
+  ctx.lineTo(altX, altY);
+  ctx.strokeStyle = 'rgba(124, 77, 255, 0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
 
-    // Attention Probability Tag in middle of beam
-    const midX = (p1x + p2x) / 2;
-    const midY = (p1y + p2y) / 2;
-    ctx.fillStyle = 'rgba(7, 19, 19, 0.85)';
-    ctx.strokeStyle = '#00E5FF';
-    ctx.lineWidth = 1;
+  // 3. SLOW-MOVING SIGNAL PULSE (Comet Dot with Pattern Flow)
+  const duration = getIntervalForSpeed(currentSpeed);
+  const elapsed = Date.now() - hopStartTime;
+  // Progress smoothly moves from 0.0 to 1.0 during the entire hop duration
+  const progress = isPaused ? 0.5 : Math.min(1.0, (elapsed % duration) / duration);
+
+  const curX = p1x + (p2x - p1x) * progress;
+  const curY = p1y + (p2y - p1y) * progress;
+
+  // Draw Glowing Comet Trail behind the dot
+  for (let t = 1; t <= 4; t++) {
+    const trailProg = Math.max(0, progress - t * 0.04);
+    const tx = p1x + (p2x - p1x) * trailProg;
+    const ty = p1y + (p2y - p1y) * trailProg;
     ctx.beginPath();
-    ctx.roundRect(midX - 26, midY - 10, 52, 20, 6);
+    ctx.arc(tx, ty, Math.max(1, 4 - t * 0.8), 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0, 255, 170, ${0.7 - t * 0.15})`;
     ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#00FFAA';
-    ctx.font = 'bold 9.5px IBM Plex Mono, monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('94.2%', midX, midY);
   }
 
-  // 3. Smooth Directed Message-Passing Pulses (Calm speed)
-  particles.forEach(p => {
-    p.progress += 0.004; // Calibrated calm flow
-    if (p.progress >= 1) p.progress = 0;
+  // Draw Main Glowing Dot
+  ctx.beginPath();
+  ctx.arc(curX, curY, 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#00FFAA';
+  ctx.shadowColor = '#00FFAA';
+  ctx.shadowBlur = 15;
+  ctx.fill();
+  ctx.shadowBlur = 0;
 
-    const curX = p1x + (p2x - p1x) * p.progress;
-    const curY = p1y + (p2y - p1y) * p.progress;
+  // Outer Pulse Ring around the moving dot
+  ctx.beginPath();
+  ctx.arc(curX, curY, 9, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0, 255, 170, 0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(curX, curY, 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#00FFAA';
-    ctx.shadowColor = '#00FFAA';
-    ctx.shadowBlur = 10;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  });
+  // Attention Probability Badge
+  const midX = (p1x + p2x) / 2;
+  const midY = (p1y + p2y) / 2;
+  ctx.fillStyle = 'rgba(7, 19, 19, 0.9)';
+  ctx.strokeStyle = '#00E5FF';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(midX - 28, midY - 11, 56, 22, 6);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = '#00FFAA';
+  ctx.font = 'bold 10px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('94.8%', midX, midY);
 
   // 4. Channel Nodes (High-Contrast Clean Badges)
   for (let i = 0; i < numChannels; i++) {
@@ -773,12 +813,12 @@ function drawGNN(ctx, w, h) {
     const nx = cx + Math.cos(angle) * radius;
     const ny = cy + Math.sin(angle) * radius;
 
-    const isTarget = latest.activeTargets.includes(i);
-    const isTuned = (aiTuned === i);
-    const isMatched = isTarget && isTuned;
+    const isCurrentThreat = (srcNode === i);
+    const isPredictedNext = (dstNode === i);
+    const isTuned = (latest.tunedCh === i);
     const isHovered = (hoveredNode === i);
 
-    if (isMatched) {
+    if (isCurrentThreat && isTuned && isLock) {
       // 🟡 Intercept Locked Halo
       ctx.beginPath();
       ctx.arc(nx, ny, 22, 0, 2 * Math.PI);
@@ -788,15 +828,15 @@ function drawGNN(ctx, w, h) {
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      // Rotating lock crosshairs
+      // Lock Crosshairs
       ctx.strokeStyle = '#FFEA00';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(nx - 14, ny); ctx.lineTo(nx + 14, ny);
       ctx.moveTo(nx, ny - 14); ctx.lineTo(nx, ny + 14);
       ctx.stroke();
-    } else if (isTarget) {
-      // 🔴 Enemy Target Beacon Ring
+    } else if (isCurrentThreat) {
+      // 🔴 Current Threat Origin Beacon
       ctx.beginPath();
       ctx.arc(nx, ny, 19, 0, 2 * Math.PI);
       ctx.fillStyle = 'rgba(255, 23, 68, 0.3)';
@@ -804,11 +844,11 @@ function drawGNN(ctx, w, h) {
       ctx.strokeStyle = '#FF1744';
       ctx.lineWidth = 2.5;
       ctx.stroke();
-    } else if (isTuned) {
-      // 🟢 AI Tuner Ring
+    } else if (isPredictedNext) {
+      // 🟢 Target Destination Node (Anticipation Ring)
       ctx.beginPath();
       ctx.arc(nx, ny, 19, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(0, 255, 170, 0.25)';
+      ctx.fillStyle = 'rgba(0, 255, 170, 0.2)';
       ctx.fill();
       ctx.strokeStyle = '#00FFAA';
       ctx.lineWidth = 2.5;
@@ -819,13 +859,13 @@ function drawGNN(ctx, w, h) {
     ctx.beginPath();
     ctx.arc(nx, ny, isHovered ? 13 : 11, 0, 2 * Math.PI);
     
-    if (isMatched) {
+    if (isCurrentThreat && isLock) {
       ctx.fillStyle = '#FFEA00';
       ctx.strokeStyle = '#FFFFFF';
-    } else if (isTarget) {
+    } else if (isCurrentThreat) {
       ctx.fillStyle = '#FF1744';
       ctx.strokeStyle = '#FFA1A1';
-    } else if (isTuned) {
+    } else if (isPredictedNext) {
       ctx.fillStyle = '#00FFAA';
       ctx.strokeStyle = '#FFFFFF';
     } else {
@@ -838,7 +878,7 @@ function drawGNN(ctx, w, h) {
     ctx.stroke();
 
     // Node Label Number
-    ctx.fillStyle = (isMatched || isTuned) ? '#040909' : '#FFFFFF';
+    ctx.fillStyle = (isCurrentThreat && isLock) || isPredictedNext ? '#040909' : '#FFFFFF';
     ctx.font = 'bold 10px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
