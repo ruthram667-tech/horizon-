@@ -350,7 +350,11 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-teal-400 flex items-center justify-center shadow-sm">
-              <span className="text-base-950 font-bold text-xs">🛡️</span>
+              <svg className="w-3.5 h-3.5 text-base-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M12 8v8"/>
+                <path d="M8 12h8"/>
+              </svg>
             </div>
             <span className="text-xs font-medium text-sage-400">
               Team HORIZON • Smart Innovation Hackathon 2026

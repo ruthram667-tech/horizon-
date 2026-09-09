@@ -19,7 +19,11 @@ export default function Navbar({ isConnected, isRunning, connectionStatus, auth,
         {/* ── Brand ── */}
         <NavLink to="/" className="flex items-center gap-3 group">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-teal-400 flex items-center justify-center shadow-md group-hover:shadow-teal-400/25 transition-all duration-300">
-            <span className="text-base-950 font-bold text-sm">🛡️</span>
+            <svg className="w-4 h-4 text-base-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 8v8"/>
+              <path d="M8 12h8"/>
+            </svg>
           </div>
           <div className="flex flex-col">
             <h1 className="text-sm font-extrabold tracking-tight text-white leading-tight">

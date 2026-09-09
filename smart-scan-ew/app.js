@@ -84,16 +84,18 @@ function getAudioContext() {
   return audioCtx;
 }
 
+const AUDIO_ICON_ON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+const AUDIO_ICON_OFF = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
+
 function toggleAudio() {
   audioEnabled = !audioEnabled;
   const btn = document.getElementById('btn-audio');
-  const icon = document.getElementById('audio-icon');
   if (audioEnabled) {
-    btn.innerHTML = '<span id="audio-icon">🔊</span> AUDIO SFX: ON';
+    btn.innerHTML = `<span id="audio-icon">${AUDIO_ICON_ON}</span> AUDIO SFX: ON`;
     btn.classList.add('active');
     playTone(880, 0.08, 'sine');
   } else {
-    btn.innerHTML = '<span id="audio-icon">🔇</span> AUDIO SFX: OFF';
+    btn.innerHTML = `<span id="audio-icon">${AUDIO_ICON_OFF}</span> AUDIO SFX: OFF`;
     btn.classList.remove('active');
   }
 }
@@ -452,9 +454,9 @@ function simulateStep() {
   // 7. Log Threat Event
   const nowStr = new Date().toTimeString().split(' ')[0] + '.' + Math.floor(Math.random() * 9);
   if (isHit) {
-    addLog('lock', `<span class="log-time">[${nowStr}]</span> 🎯 <b>INTERCEPT LOCKED:</b> Signal on CH-${tunedChannel} (${centerFreq} GHz) | GNN Conf: ${(92 + Math.random()*7).toFixed(1)}% | MATCH!`);
+    addLog('lock', `<span class="log-time">[${nowStr}]</span> <span class="log-tag tag-lock">[LOCK]</span> <b>INTERCEPT LOCKED:</b> Signal on CH-${tunedChannel} (${centerFreq} GHz) | GNN Conf: ${(92 + Math.random()*7).toFixed(1)}% | MATCH!`);
   } else {
-    addLog('threat', `<span class="log-time">[${nowStr}]</span> 📡 <b>HOP:</b> Emitter at CH-${activeTargets[0]} (${(2.0 + (activeTargets[0]/numChannels)*16).toFixed(1)} GHz) | AI receiver at CH-${tunedChannel}`);
+    addLog('threat', `<span class="log-time">[${nowStr}]</span> <span class="log-tag tag-threat">[HOP]</span> <b>EMITTER HOP:</b> Emitter at CH-${activeTargets[0]} (${(2.0 + (activeTargets[0]/numChannels)*16).toFixed(1)} GHz) | AI receiver at CH-${tunedChannel}`);
   }
 
   // Update dynamic metrics
@@ -478,15 +480,15 @@ function updateMetrics() {
   document.getElementById('val-eff').textContent = (eff * 100).toFixed(1) + '%';
   document.getElementById('val-latency').textContent = latency;
 
-  updateRing('ring-pd', pd, '#00FFAA');
-  updateRing('ring-pfa', 1 - (pfa * 10), '#76FF03');
-  updateRing('ring-eff', eff, '#FFEA00');
+  updateRing('ring-pd', pd, '#00B894');
+  updateRing('ring-pfa', 1 - (pfa * 10), '#00A8CC');
+  updateRing('ring-eff', eff, '#F5B700');
 }
 
 function updateRing(id, value, color) {
   const el = document.getElementById(id);
   if (!el) return;
-  const size = 38;
+  const size = 40;
   const sw = 3.5;
   const r = (size - sw) / 2;
   const circ = 2 * Math.PI * r;
@@ -496,15 +498,14 @@ function updateRing(id, value, color) {
   el.innerHTML = `<svg width="${size}" height="${size}">
     <circle class="track" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${sw}"/>
     <circle class="fill" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${sw}"
-      stroke="${color}" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
-      style="filter:drop-shadow(0 0 6px ${color}80)"/>
+      stroke="${color}" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
   </svg>`;
 }
 
 function initMiniRings() {
-  updateRing('ring-pd', 0, '#00FFAA');
-  updateRing('ring-pfa', 1, '#76FF03');
-  updateRing('ring-eff', 0, '#FFEA00');
+  updateRing('ring-pd', 0, '#00B894');
+  updateRing('ring-pfa', 1, '#00A8CC');
+  updateRing('ring-eff', 0, '#F5B700');
 }
 
 function addLog(type, htmlContent) {
@@ -529,19 +530,19 @@ for (let i = 0; i < 256; i++) {
   let r, g, b;
   if (t < 0.2) {
     const s = t / 0.2;
-    r = Math.floor(s * 4); g = Math.floor(s * 20); b = Math.floor(s * 30);
+    r = Math.floor(s * 9); g = Math.floor(s * 25); b = Math.floor(s * 45);
   } else if (t < 0.45) {
     const s = (t - 0.2) / 0.25;
-    r = Math.floor(4 + s * 0); g = Math.floor(20 + s * 180); b = Math.floor(30 + s * 225);
+    r = Math.floor(9 + s * 0); g = Math.floor(25 + s * 160); b = Math.floor(45 + s * 180);
   } else if (t < 0.7) {
     const s = (t - 0.45) / 0.25;
-    r = Math.floor(s * 0); g = Math.floor(200 + s * 55); b = Math.floor(255 - s * 85);
+    r = Math.floor(s * 0); g = Math.floor(185 + s * 45); b = Math.floor(225 - s * 105);
   } else if (t < 0.88) {
     const s = (t - 0.7) / 0.18;
-    r = Math.floor(s * 255); g = Math.floor(255 - s * 21); b = 0;
+    r = Math.floor(s * 245); g = Math.floor(230 - s * 47); b = 0;
   } else {
     const s = (t - 0.88) / 0.12;
-    r = 255; g = Math.floor(234 * (1 - s)); b = Math.floor(s * 68);
+    r = 230 + Math.floor(s * 25); g = Math.floor(183 * (1 - s)); b = Math.floor(s * 70);
   }
   SPECTRUM_MAP.push([r, g, b]);
 }
@@ -573,12 +574,12 @@ function startRenderLoop() {
     const ctx = canvas.getContext('2d');
     const octx = overlay.getContext('2d');
 
-    ctx.fillStyle = '#040909';
+    ctx.fillStyle = '#09131D';
     ctx.fillRect(0, 0, w, h);
     octx.clearRect(0, 0, w, h);
 
     if (history.length === 0) {
-      ctx.fillStyle = '#577B6E';
+      ctx.fillStyle = '#829AB1';
       ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Press START SCAN to activate tactical RF sensor...', w / 2, h / 2);
@@ -594,13 +595,13 @@ function startRenderLoop() {
         for (let ch = 0; ch < nCh; ch++) {
           const norm = Math.max(0, Math.min(1, ((rd.powers[ch] || -90) + 95) / 80));
           const ci = Math.floor(norm * 255);
-          const [cr, cg, cb] = SPECTRUM_MAP[ci] || [4, 15, 20];
+          const [cr, cg, cb] = SPECTRUM_MAP[ci] || [9, 25, 45];
           ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
           ctx.fillRect(Math.floor(ch * cellW), Math.floor(y), Math.ceil(cellW) + 1, Math.ceil(cellH) + 1);
         }
       }
 
-      ctx.strokeStyle = 'rgba(0, 255, 170, 0.08)';
+      ctx.strokeStyle = 'rgba(220, 231, 239, 0.08)';
       ctx.lineWidth = 1;
       for (let ch = 1; ch < nCh; ch++) {
         const x = Math.floor(ch * cellW);
@@ -609,22 +610,22 @@ function startRenderLoop() {
         ctx.stroke();
       }
 
-      sweepPos += 0.0018; // Slower sweep for calm presentation
+      sweepPos += 0.0018;
       if (sweepPos > 1) sweepPos = 0;
       const sweepY = h * sweepPos;
       
       ctx.beginPath();
       ctx.moveTo(0, sweepY); ctx.lineTo(w, sweepY);
-      ctx.strokeStyle = 'rgba(0, 255, 170, 0.6)';
+      ctx.strokeStyle = 'rgba(0, 184, 148, 0.75)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      const sg = ctx.createLinearGradient(0, sweepY - 15, 0, sweepY + 15);
+      const sg = ctx.createLinearGradient(0, sweepY - 14, 0, sweepY + 14);
       sg.addColorStop(0, 'transparent');
-      sg.addColorStop(0.5, 'rgba(0, 255, 170, 0.1)');
+      sg.addColorStop(0.5, 'rgba(0, 184, 148, 0.12)');
       sg.addColorStop(1, 'transparent');
       ctx.fillStyle = sg;
-      ctx.fillRect(0, sweepY - 15, w, 30);
+      ctx.fillRect(0, sweepY - 14, w, 28);
 
       const latest = history[nRows - 1];
       const latestY = h - cellH;
@@ -635,40 +636,40 @@ function startRenderLoop() {
         
         octx.beginPath();
         octx.arc(cx, cy, Math.max(6, cellW / 3), 0, Math.PI * 2);
-        octx.strokeStyle = '#FF1744';
+        octx.strokeStyle = '#E63946';
         octx.lineWidth = 2.5;
         octx.stroke();
       }
 
       const tx = latest.tunedCh * cellW;
       if (latest.isHit) {
-        octx.fillStyle = 'rgba(255, 234, 0, 0.28)';
+        octx.fillStyle = 'rgba(245, 183, 0, 0.25)';
         octx.fillRect(tx, 0, cellW, h);
-        octx.strokeStyle = '#FFEA00';
+        octx.strokeStyle = '#F5B700';
         octx.lineWidth = 2.5;
         octx.strokeRect(tx, latestY, cellW, cellH);
 
-        octx.fillStyle = '#FFEA00';
+        octx.fillStyle = '#F5B700';
         octx.font = 'bold 10px "JetBrains Mono", monospace';
         octx.textAlign = 'center';
-        octx.fillText('⚡ LOCKED', tx + cellW / 2, latestY - 6);
+        octx.fillText('[ LOCKED ]', tx + cellW / 2, latestY - 6);
       } else {
-        octx.fillStyle = 'rgba(0, 255, 170, 0.14)';
+        octx.fillStyle = 'rgba(0, 184, 148, 0.15)';
         octx.fillRect(tx, 0, cellW, h);
-        octx.strokeStyle = 'rgba(0, 255, 170, 0.8)';
+        octx.strokeStyle = '#00B894';
         octx.lineWidth = 2;
         octx.strokeRect(tx, latestY, cellW, cellH);
       }
 
       octx.font = '500 10px "JetBrains Mono", monospace';
       octx.textAlign = 'center';
-      octx.fillStyle = '#F0FDF4';
+      octx.fillStyle = '#F8FAFC';
       for (let ch = 0; ch < nCh; ch++) {
         const fGhz = (2.0 + (ch / nCh) * 16.0).toFixed(1);
         octx.fillText(`CH${ch}`, ch * cellW + cellW / 2, 14);
-        octx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+        octx.fillStyle = '#94A3B8';
         octx.fillText(`${fGhz}G`, ch * cellW + cellW / 2, 26);
-        octx.fillStyle = '#F0FDF4';
+        octx.fillStyle = '#F8FAFC';
       }
     }
 
@@ -692,7 +693,7 @@ function drawGNN(ctx, w, h) {
   const radius = Math.min(w, h) * 0.36;
 
   if (history.length === 0) {
-    ctx.fillStyle = '#577B6E';
+    ctx.fillStyle = '#829AB1';
     ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Awaiting scan initialization...', cx, cy);
@@ -704,7 +705,7 @@ function drawGNN(ctx, w, h) {
   const dstNode = predictedNext;
   const isLock = latest.isHit;
 
-  // 1. Draw Clean Subtle Outer Frequency Ring (Perimeter)
+  // 1. Draw Clean Perimeter Ring
   ctx.beginPath();
   for (let i = 0; i < numChannels; i++) {
     const angle = i * 2 * Math.PI / numChannels;
@@ -714,28 +715,25 @@ function drawGNN(ctx, w, h) {
     else ctx.lineTo(nx, ny);
   }
   ctx.closePath();
-  ctx.strokeStyle = 'rgba(0, 255, 170, 0.12)';
+  ctx.strokeStyle = '#DCE7EF';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // 2. Draw Active Prediction Beam (From Current Emitter to Predicted Next Hop)
+  // 2. Draw Active Prediction Beam
   const p1x = cx + Math.cos(srcNode * 2 * Math.PI / numChannels) * radius;
   const p1y = cy + Math.sin(srcNode * 2 * Math.PI / numChannels) * radius;
   const p2x = cx + Math.cos(dstNode * 2 * Math.PI / numChannels) * radius;
   const p2y = cy + Math.sin(dstNode * 2 * Math.PI / numChannels) * radius;
 
-  // Main Glowing Attention Vector
+  // Main Attention Vector
   ctx.beginPath();
   ctx.moveTo(p1x, p1y);
   ctx.lineTo(p2x, p2y);
-  ctx.strokeStyle = 'rgba(0, 229, 255, 0.85)';
-  ctx.lineWidth = 3;
-  ctx.shadowColor = '#00E5FF';
-  ctx.shadowBlur = 14;
+  ctx.strokeStyle = 'rgba(38, 132, 255, 0.85)';
+  ctx.lineWidth = 2.5;
   ctx.stroke();
-  ctx.shadowBlur = 0;
 
-  // Secondary subtle transition probability line (top alternative hop)
+  // Secondary subtle transition probability line
   const probs = transitionMatrix[srcNode] || [];
   let altNode = (srcNode + 3) % numChannels;
   let maxAlt = 0;
@@ -750,64 +748,59 @@ function drawGNN(ctx, w, h) {
   ctx.beginPath();
   ctx.moveTo(p1x, p1y);
   ctx.lineTo(altX, altY);
-  ctx.strokeStyle = 'rgba(124, 77, 255, 0.3)';
+  ctx.strokeStyle = 'rgba(124, 77, 255, 0.25)';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // 3. SLOW-MOVING SIGNAL PULSE (Comet Dot with Pattern Flow)
+  // 3. SLOW-MOVING SIGNAL PULSE
   const duration = getIntervalForSpeed(currentSpeed);
   const elapsed = Date.now() - hopStartTime;
-  // Progress smoothly moves from 0.0 to 1.0 during the entire hop duration
   const progress = isPaused ? 0.5 : Math.min(1.0, (elapsed % duration) / duration);
 
   const curX = p1x + (p2x - p1x) * progress;
   const curY = p1y + (p2y - p1y) * progress;
 
-  // Draw Glowing Comet Trail behind the dot
+  // Comet Trail
   for (let t = 1; t <= 4; t++) {
     const trailProg = Math.max(0, progress - t * 0.04);
     const tx = p1x + (p2x - p1x) * trailProg;
     const ty = p1y + (p2y - p1y) * trailProg;
     ctx.beginPath();
     ctx.arc(tx, ty, Math.max(1, 4 - t * 0.8), 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(0, 255, 170, ${0.7 - t * 0.15})`;
+    ctx.fillStyle = `rgba(0, 184, 148, ${0.6 - t * 0.12})`;
     ctx.fill();
   }
 
-  // Draw Main Glowing Dot
+  // Main Pulse Dot
   ctx.beginPath();
-  ctx.arc(curX, curY, 5, 0, Math.PI * 2);
-  ctx.fillStyle = '#00FFAA';
-  ctx.shadowColor = '#00FFAA';
-  ctx.shadowBlur = 15;
+  ctx.arc(curX, curY, 4.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#00B894';
   ctx.fill();
-  ctx.shadowBlur = 0;
 
-  // Outer Pulse Ring around the moving dot
   ctx.beginPath();
-  ctx.arc(curX, curY, 9, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(0, 255, 170, 0.6)';
+  ctx.arc(curX, curY, 8, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0, 184, 148, 0.4)';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // Attention Probability Badge
   const midX = (p1x + p2x) / 2;
   const midY = (p1y + p2y) / 2;
-  ctx.fillStyle = 'rgba(7, 19, 19, 0.9)';
-  ctx.strokeStyle = '#00E5FF';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.strokeStyle = '#2684FF';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.roundRect(midX - 28, midY - 11, 56, 22, 6);
+  ctx.roundRect(midX - 26, midY - 10, 52, 20, 4);
   ctx.fill();
   ctx.stroke();
 
-  ctx.fillStyle = '#00FFAA';
+  ctx.fillStyle = '#102A43';
   ctx.font = 'bold 10px "JetBrains Mono", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('94.8%', midX, midY);
 
-  // 4. Channel Nodes (High-Contrast Clean Badges)
+  // 4. Channel Nodes
   for (let i = 0; i < numChannels; i++) {
     const angle = i * 2 * Math.PI / numChannels;
     const nx = cx + Math.cos(angle) * radius;
@@ -819,66 +812,74 @@ function drawGNN(ctx, w, h) {
     const isHovered = (hoveredNode === i);
 
     if (isCurrentThreat && isTuned && isLock) {
-      // 🟡 Intercept Locked Halo
+      // Intercept Locked
       ctx.beginPath();
-      ctx.arc(nx, ny, 22, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(255, 234, 0, 0.35)';
+      ctx.arc(nx, ny, 20, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(245, 183, 0, 0.2)';
       ctx.fill();
-      ctx.strokeStyle = '#FFEA00';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#F5B700';
+      ctx.lineWidth = 2.5;
       ctx.stroke();
 
-      // Lock Crosshairs
-      ctx.strokeStyle = '#FFEA00';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#F5B700';
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(nx - 14, ny); ctx.lineTo(nx + 14, ny);
-      ctx.moveTo(nx, ny - 14); ctx.lineTo(nx, ny + 14);
+      ctx.moveTo(nx - 12, ny); ctx.lineTo(nx + 12, ny);
+      ctx.moveTo(nx, ny - 12); ctx.lineTo(nx, ny + 12);
       ctx.stroke();
     } else if (isCurrentThreat) {
-      // 🔴 Current Threat Origin Beacon
+      // Current Threat
       ctx.beginPath();
-      ctx.arc(nx, ny, 19, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(255, 23, 68, 0.3)';
+      ctx.arc(nx, ny, 18, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(230, 57, 70, 0.15)';
       ctx.fill();
-      ctx.strokeStyle = '#FF1744';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#E63946';
+      ctx.lineWidth = 2;
       ctx.stroke();
     } else if (isPredictedNext) {
-      // 🟢 Target Destination Node (Anticipation Ring)
+      // Predicted Target
       ctx.beginPath();
-      ctx.arc(nx, ny, 19, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(0, 255, 170, 0.2)';
+      ctx.arc(nx, ny, 18, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(0, 184, 148, 0.15)';
       ctx.fill();
-      ctx.strokeStyle = '#00FFAA';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#00B894';
+      ctx.lineWidth = 2;
       ctx.stroke();
     }
 
     // Node Core
     ctx.beginPath();
-    ctx.arc(nx, ny, isHovered ? 13 : 11, 0, 2 * Math.PI);
+    ctx.arc(nx, ny, isHovered ? 12 : 10.5, 0, 2 * Math.PI);
     
     if (isCurrentThreat && isLock) {
-      ctx.fillStyle = '#FFEA00';
-      ctx.strokeStyle = '#FFFFFF';
+      ctx.fillStyle = '#FEF3C7';
+      ctx.strokeStyle = '#F5B700';
     } else if (isCurrentThreat) {
-      ctx.fillStyle = '#FF1744';
-      ctx.strokeStyle = '#FFA1A1';
+      ctx.fillStyle = '#FEE2E2';
+      ctx.strokeStyle = '#E63946';
     } else if (isPredictedNext) {
-      ctx.fillStyle = '#00FFAA';
-      ctx.strokeStyle = '#FFFFFF';
+      ctx.fillStyle = '#D1FAE5';
+      ctx.strokeStyle = '#00B894';
     } else {
-      ctx.fillStyle = '#0B1C1C';
-      ctx.strokeStyle = 'rgba(0, 255, 170, 0.35)';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = '#CBD5E1';
     }
 
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.fill();
     ctx.stroke();
 
-    // Node Label Number
-    ctx.fillStyle = (isCurrentThreat && isLock) || isPredictedNext ? '#040909' : '#FFFFFF';
+    // Node Label
+    if (isCurrentThreat && isLock) {
+      ctx.fillStyle = '#92400E';
+    } else if (isCurrentThreat) {
+      ctx.fillStyle = '#991B1B';
+    } else if (isPredictedNext) {
+      ctx.fillStyle = '#065F46';
+    } else {
+      ctx.fillStyle = '#102A43';
+    }
+
     ctx.font = 'bold 10px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -929,8 +930,8 @@ function setupGNNInteraction() {
       document.getElementById('insp-ch').textContent = `CHANNEL ${found} (BAND ${found < 4 ? 'S' : (found < 8 ? 'C' : 'X')})`;
       document.getElementById('insp-freq').textContent = `${fGhz} GHz`;
       document.getElementById('insp-pwr').textContent = `${pwr} dBm`;
-      document.getElementById('insp-threat').textContent = isThreat ? '🔴 EMITTER ACTIVE' : '⚪ IDLE SPECTRUM';
-      document.getElementById('insp-threat').style.color = isThreat ? '#FF1744' : '#94A3B8';
+      document.getElementById('insp-threat').textContent = isThreat ? 'EMITTER ACTIVE' : 'IDLE SPECTRUM';
+      document.getElementById('insp-threat').style.color = isThreat ? '#E63946' : '#627D98';
       document.getElementById('insp-att').textContent = `${attWeight}%`;
       document.getElementById('insp-pred').textContent = `${predProb}%`;
 

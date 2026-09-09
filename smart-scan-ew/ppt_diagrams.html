@@ -33,7 +33,7 @@
     }
     .flow-box h3 { margin: 0 0 10px 0; color: white; font-size: 16px; }
     .flow-box p { margin: 0; color: #7a9a8e; font-size: 12px; line-height: 1.4; }
-    .flow-arrow { color: #2dd4a8; font-size: 24px; font-weight: bold; }
+    .flow-arrow { display: flex; justify-content: center; align-items: center; color: #2dd4a8; }
 
     /* ── Diagram 2: AI Brain ── */
     .brain-container { display: flex; justify-content: center; gap: 40px; }
@@ -45,7 +45,7 @@
     }
     .brain-box h4 { margin: 0 0 5px 0; color: white; }
     .brain-box p { margin: 0; color: #7a9a8e; font-size: 13px; }
-    .brain-arrow { text-align: center; color: #2dd4a8; font-size: 20px; margin-bottom: 15px; }
+    .brain-arrow { display: flex; justify-content: center; align-items: center; color: #2dd4a8; margin-bottom: 15px; }
 
     /* ── Diagram 3: Comparison Chart ── */
     .comparison-container { max-width: 800px; margin: 0 auto; }
@@ -169,22 +169,42 @@
         <h3>1. Radio Signals</h3>
         <p>Enemy transmitters changing frequencies very fast.</p>
       </div>
-      <div class="flow-arrow">➔</div>
+      <div class="flow-arrow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </div>
       <div class="flow-box">
         <h3>2. AI Pattern Detector</h3>
         <p>Scans the airwaves to find hidden connections.</p>
       </div>
-      <div class="flow-arrow">➔</div>
+      <div class="flow-arrow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </div>
       <div class="flow-box">
         <h3>3. AI Decision Maker</h3>
         <p>Learns from experience to guess the enemy's next move.</p>
       </div>
-      <div class="flow-arrow">➔</div>
+      <div class="flow-arrow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </div>
       <div class="flow-box">
         <h3>4. Data Server</h3>
         <p>Processes the information instantly without delay.</p>
       </div>
-      <div class="flow-arrow">➔</div>
+      <div class="flow-arrow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </div>
       <div class="flow-box">
         <h3>5. User Screen</h3>
         <p>Shows a live, easy-to-read dashboard for operators.</p>
@@ -202,12 +222,22 @@
           <h4>Input Data</h4>
           <p>Takes in raw signal strength and frequency data.</p>
         </div>
-        <div class="brain-arrow">⬇</div>
+        <div class="brain-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </div>
         <div class="brain-box">
           <h4>Relationship Mapping</h4>
           <p>Looks at how different frequencies relate to each other.</p>
         </div>
-        <div class="brain-arrow">⬇</div>
+        <div class="brain-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </div>
         <div class="brain-box">
           <h4>Key Features Extraction</h4>
           <p>Creates a summary of the most important signal patterns.</p>
@@ -220,12 +250,22 @@
           <h4>Current Situation</h4>
           <p>Looks at the summary provided by the Scanner.</p>
         </div>
-        <div class="brain-arrow">⬇</div>
+        <div class="brain-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </div>
         <div class="brain-box">
           <h4>Experience Processing</h4>
           <p>Compares the current situation to past successes and mistakes.</p>
         </div>
-        <div class="brain-arrow">⬇</div>
+        <div class="brain-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </div>
         <div class="brain-box">
           <h4>Final Decision</h4>
           <p>Chooses exactly which frequency channel to tune into next to catch the enemy.</p>
