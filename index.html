@@ -245,6 +245,7 @@
           <button class="pitch-tab-btn active" onclick="switchPitchSlide(0, this)">1. Architecture Flow</button>
           <button class="pitch-tab-btn" onclick="switchPitchSlide(1, this)">2. AI Decision Brain</button>
           <button class="pitch-tab-btn" onclick="switchPitchSlide(2, this)">3. Benchmarks vs Traditional</button>
+          <button class="pitch-tab-btn" onclick="switchPitchSlide(3, this)">4. 3-Tier Sandwich Architecture</button>
         </div>
         <button class="btn-control btn-secondary" onclick="closePitchModal()" style="padding: 6px 12px;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px; margin-right: 4px;">
@@ -258,13 +259,13 @@
       <div class="pitch-modal-body">
         <!-- Slide 1: Architecture -->
         <div id="slide-0" class="pitch-slide active">
-          <h3 style="color:var(--neon-mint); font-size: 20px; font-weight: 700; margin-bottom: 8px;">End-to-End System Architecture</h3>
+          <h3 style="color:var(--text-primary); font-size: 18px; font-weight: 700; margin-bottom: 6px;">End-to-End System Architecture</h3>
           <p style="color:var(--text-secondary); font-size: 13px;">Real-time Electronic Warfare support combining Deep Reinforcement Learning with Graph Attention Networks (GAT).</p>
           
           <div class="slide-grid-3">
             <div class="slide-box">
               <div class="slide-icon-wrapper">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path>
                   <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path>
                   <circle cx="12" cy="12" r="2"></circle>
@@ -277,7 +278,7 @@
             </div>
             <div class="slide-box">
               <div class="slide-icon-wrapper">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--neon-mint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="6" cy="6" r="3"></circle>
                   <circle cx="18" cy="6" r="3"></circle>
                   <circle cx="12" cy="18" r="3"></circle>
@@ -291,7 +292,7 @@
             </div>
             <div class="slide-box">
               <div class="slide-icon-wrapper">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--intercept-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-yellow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                 </svg>
               </div>
@@ -303,18 +304,18 @@
 
         <!-- Slide 2: AI Brain Scanner & Player -->
         <div id="slide-1" class="pitch-slide">
-          <h3 style="color:var(--neon-mint); font-size: 20px; font-weight: 700; margin-bottom: 8px;">Dual-Core AI Decision Loop</h3>
+          <h3 style="color:var(--text-primary); font-size: 18px; font-weight: 700; margin-bottom: 6px;">Dual-Core AI Decision Loop</h3>
           <p style="color:var(--text-secondary); font-size: 13px;">How the Scanner (GNN) and Player (DQN) cooperate to outsmart enemy frequency hoppers.</p>
 
-          <div style="display: flex; gap: 20px; margin-top: 20px;">
+          <div style="display: flex; gap: 16px; margin-top: 18px;">
             <div class="slide-box" style="flex: 1; text-align: left;">
-              <h4 style="color:var(--neon-cyan); border-bottom: 1px solid rgba(0,229,255,0.2); padding-bottom: 8px; margin-bottom: 12px;">Part 1: The Scanner (GNN Spatial Extractor)</h4>
+              <h4 style="color:var(--accent-cyan); border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; margin-bottom: 12px;">Part 1: The Scanner (GNN Spatial Extractor)</h4>
               <p>• Ingests continuous spectrum energy across all monitored bands.</p>
               <p style="margin-top: 6px;">• Extracts hidden spatial correlations between hopping channels.</p>
               <p style="margin-top: 6px;">• Produces relational state embeddings for the decision agent.</p>
             </div>
             <div class="slide-box" style="flex: 1; text-align: left;">
-              <h4 style="color:var(--neon-mint); border-bottom: 1px solid rgba(0,255,170,0.2); padding-bottom: 8px; margin-bottom: 12px;">Part 2: The Player (DQN Policy Agent)</h4>
+              <h4 style="color:var(--accent-green); border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; margin-bottom: 12px;">Part 2: The Player (DQN Policy Agent)</h4>
               <p>• Evaluates current state embedding against trained Q-value network.</p>
               <p style="margin-top: 6px;">• Predicts enemy emitter's next hop transition with &gt;94% accuracy.</p>
               <p style="margin-top: 6px;">• Instantly tunes the receiver front-end before the emitter fires.</p>
@@ -324,13 +325,13 @@
 
         <!-- Slide 3: Benchmark Comparison -->
         <div id="slide-2" class="pitch-slide">
-          <h3 style="color:var(--neon-mint); font-size: 20px; font-weight: 700; margin-bottom: 8px;">Performance Benchmarks vs Traditional EW Systems</h3>
-          <p style="color:var(--text-secondary); font-size: 13px; margin-bottom: 24px;">Tested against agile Frequency Hopping Spread Spectrum (FHSS) radar emitters.</p>
+          <h3 style="color:var(--text-primary); font-size: 18px; font-weight: 700; margin-bottom: 6px;">Performance Benchmarks vs Traditional EW Systems</h3>
+          <p style="color:var(--text-secondary); font-size: 13px; margin-bottom: 22px;">Tested against agile Frequency Hopping Spread Spectrum (FHSS) radar emitters.</p>
 
           <div class="benchmark-row">
             <div class="benchmark-label">
               <span>Detection Probability (P<sub>d</sub>)</span>
-              <span><span style="color:var(--text-secondary)">Traditional: 35%</span> | <span class="accent-mint">Smart Scan EW: 95.2% (+172%)</span></span>
+              <span><span style="color:var(--text-secondary)">Traditional: 35%</span> | <span class="accent-mint" style="font-weight:700">Smart Scan EW: 95.2% (+172%)</span></span>
             </div>
             <div class="bar-track">
               <div class="bar-fill-old" style="width: 35%;">35% (Sweeper)</div>
@@ -341,25 +342,91 @@
           <div class="benchmark-row">
             <div class="benchmark-label">
               <span>False Alarm Rate (P<sub>fa</sub>)</span>
-              <span><span style="color:var(--text-secondary)">Traditional: 15.0%</span> | <span class="accent-lime">Smart Scan EW: 1.1% (13x Reduction)</span></span>
+              <span><span style="color:var(--text-secondary)">Traditional: 15.0%</span> | <span class="accent-cyan" style="font-weight:700">Smart Scan EW: 1.1% (13x Reduction)</span></span>
             </div>
             <div class="bar-track">
               <div class="bar-fill-old" style="width: 60%;">15% (High Noise)</div>
-              <div class="bar-fill-new" style="width: 15%; background: var(--intercept-lime);">1.1% (Filtered)</div>
+              <div class="bar-fill-new" style="width: 15%; background: var(--accent-cyan);">1.1% (Filtered)</div>
             </div>
           </div>
 
           <div class="benchmark-row">
             <div class="benchmark-label">
               <span>Interception Latency</span>
-              <span><span style="color:var(--text-secondary)">Traditional: 45 ms</span> | <span class="accent-cyan">Smart Scan EW: 1.8 ms (25x Faster)</span></span>
+              <span><span style="color:var(--text-secondary)">Traditional: 45 ms</span> | <span class="accent-gold" style="font-weight:700">Smart Scan EW: 1.8 ms (25x Faster)</span></span>
             </div>
             <div class="bar-track">
               <div class="bar-fill-old" style="width: 80%;">45 ms (Blind Sweeping)</div>
-              <div class="bar-fill-new" style="width: 20%; background: var(--neon-cyan);">1.8 ms (Predictive)</div>
+              <div class="bar-fill-new" style="width: 20%; background: var(--accent-yellow);">1.8 ms (Predictive)</div>
             </div>
           </div>
         </div>
+
+        <!-- Slide 4: 3-Tier Sandwich Architecture -->
+        <div id="slide-3" class="pitch-slide">
+          <h3 style="color:var(--text-primary); font-size: 18px; font-weight: 700; margin-bottom: 6px;">3-Tier Sandwich Architecture: Sensor ↔ AI Brain ↔ Tactical Actuation</h3>
+          <p style="color:var(--text-secondary); font-size: 13px;">Layered pipeline decoupling wideband RF signal ingestion, relational GNN reasoning, and sub-2ms hardware actuation.</p>
+
+          <div class="sandwich-stack">
+            <!-- Tier 1 -->
+            <div class="sandwich-tier-card">
+              <div class="sandwich-tier-badge tier-top">T1</div>
+              <div class="sandwich-tier-content">
+                <h4>
+                  <span>Top Layer: RF Spectrum Ingestion &amp; DSP Channelizer</span>
+                  <span class="sandwich-tag">2.0 – 18.0 GHz</span>
+                </h4>
+                <p>Captures continuous wideband RF spectrum via Software Defined Radio (SDR), executes high-speed FFT channelization, and outputs power spectral density matrices at 30 FPS.</p>
+                <div class="sandwich-tier-metrics">
+                  <span class="sandwich-tag">12–24 RF Channels</span>
+                  <span class="sandwich-tag">Noise Floor: -95 dBm</span>
+                  <span class="sandwich-tag">30 FPS Stream</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sandwich-connector">⬇ Sensor Data Flow (PSD Matrices) ⬇</div>
+
+            <!-- Tier 2 -->
+            <div class="sandwich-tier-card">
+              <div class="sandwich-tier-badge tier-mid">T2</div>
+              <div class="sandwich-tier-content">
+                <h4>
+                  <span>Core Middle Layer: GNN Relational Reasoning &amp; DRL Policy Agent (The Filling)</span>
+                  <span class="sandwich-tag">GAT + DQN</span>
+                </h4>
+                <p>Models channel correlations with Graph Attention Networks (GAT), builds dynamic Markov transition graph embeddings, and selects optimal receiver tuning 1 hop ahead of the enemy emitter.</p>
+                <div class="sandwich-tier-metrics">
+                  <span class="sandwich-tag">GAT Multi-Head Attention</span>
+                  <span class="sandwich-tag">DQN Actor-Critic</span>
+                  <span class="sandwich-tag">&gt;94.8% Hop Prediction</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sandwich-connector">⬇ Optimal Tuning Decision (Next-Hop Command) ⬇</div>
+
+            <!-- Tier 3 -->
+            <div class="sandwich-tier-card">
+              <div class="sandwich-tier-badge tier-bot">T3</div>
+              <div class="sandwich-tier-content">
+                <h4>
+                  <span>Bottom Layer: Hardware Tuner Actuation &amp; Threat Telemetry</span>
+                  <span class="sandwich-tag">Sub-2ms Lock</span>
+                </h4>
+                <p>Commands fast-tuning RF synthesizers to intercept frequency hops in real-time, logs emitter threat intelligence, and feeds live KPI telemetry to the command center.</p>
+                <div class="sandwich-tier-metrics">
+                  <span class="sandwich-tag">1.8 ms Latency</span>
+                  <span class="sandwich-tag">95.2% Detection P<sub>d</sub></span>
+                  <span class="sandwich-tag">1.1% False Alarm P<sub>fa</sub></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
       </div>
     </div>
   </div>
