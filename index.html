@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Smart Scan EW — High-Speed AI-powered Electronic Warfare Support System. Team HORIZON — SIH26055." />
   <title>Smart Scan EW — Tactical AI Dashboard | Team HORIZON</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ffaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/><path d='M12 8v8'/><path d='M8 12h8'/></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300B894' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/><path d='M12 8v8'/><path d='M8 12h8'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
 
   <!-- ════════════════════════════════════════════
-       TACTICAL NAVBAR
+       TACTICAL NAVBAR & VIEW SWITCHER
        ════════════════════════════════════════════ -->
   <nav class="glass-navbar">
     <div class="navbar-inner">
@@ -31,6 +31,24 @@
         </div>
       </div>
       
+      <!-- Center: View Switcher Tabs -->
+      <div class="view-switch-nav">
+        <button id="tab-tactical" class="btn-view-tab active" onclick="switchDashboardView('tactical')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          ⚡ Live Tactical Scan
+        </button>
+        <button id="tab-sandwich" class="btn-view-tab sandwich-tab" onclick="switchDashboardView('sandwich')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="4" rx="1"></rect>
+            <rect x="2" y="10" width="20" height="4" rx="1"></rect>
+            <rect x="2" y="16" width="20" height="4" rx="1"></rect>
+          </svg>
+          🥪 3-Tier Sandwich Architecture
+        </button>
+      </div>
+
       <div class="navbar-right">
         <!-- Audio Sonification Toggle -->
         <button id="btn-audio" class="btn-nav-action" onclick="toggleAudio()">
@@ -117,56 +135,343 @@
   </div>
 
   <!-- ════════════════════════════════════════════
-       MAIN WORKSPACE (Spectrogram + GNN Visualizer)
+       VIEW 1: TACTICAL LIVE SCAN (Waterfall + GNN Visualizer)
        ════════════════════════════════════════════ -->
-  <div class="main-workspace">
-    <!-- Left Column: Waterfall Spectrogram -->
-    <div class="glass-card waterfall-panel">
-      <div class="panel-header">
-        <h2><span class="diamond">◆</span> High-Resolution Waterfall Spectrogram</h2>
-        <div class="panel-actions">
-          <span class="legend-pill threat"><span class="legend-dot dot-red"></span> Target Signal</span>
-          <span class="legend-pill tuner"><span class="legend-dot dot-green"></span> AI Interceptor</span>
-          <span class="legend-pill lock"><span class="legend-dot dot-yellow"></span> Intercept Locked</span>
+  <div id="tactical-scan-view" class="view-panel active">
+    <div class="main-workspace">
+      <!-- Left Column: Waterfall Spectrogram -->
+      <div class="glass-card waterfall-panel">
+        <div class="panel-header">
+          <h2><span class="diamond">◆</span> High-Resolution Waterfall Spectrogram</h2>
+          <div class="panel-actions">
+            <span class="legend-pill threat"><span class="legend-dot dot-red"></span> Target Signal</span>
+            <span class="legend-pill tuner"><span class="legend-dot dot-green"></span> AI Interceptor</span>
+            <span class="legend-pill lock"><span class="legend-dot dot-yellow"></span> Intercept Locked</span>
+          </div>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="waterfall-canvas"></canvas>
+          <canvas id="overlay-canvas"></canvas>
         </div>
       </div>
-      <div class="canvas-wrapper">
-        <canvas id="waterfall-canvas"></canvas>
-        <canvas id="overlay-canvas"></canvas>
+
+      <!-- Right Column: GNN Topology & Live Threat Intelligence Logs -->
+      <div class="side-panel">
+        <!-- Top: GNN Attention Graph -->
+        <div class="glass-card gnn-panel">
+          <div class="panel-header">
+            <h2><span class="diamond">◆</span> GNN Relational Attention Graph</h2>
+            <span id="gnn-mode-pill" class="legend-pill tuner">GAT Message Passing</span>
+          </div>
+          <div class="canvas-wrapper" id="gnn-wrapper">
+            <canvas id="gnn-canvas"></canvas>
+            <!-- Hover Node Inspector HUD -->
+            <div id="node-inspector" class="node-inspector">
+              <div class="inspector-title" id="insp-ch">CHANNEL --</div>
+              <div class="inspector-row"><span>Center Freq:</span><span id="insp-freq">-- GHz</span></div>
+              <div class="inspector-row"><span>Signal Power:</span><span id="insp-pwr">-- dBm</span></div>
+              <div class="inspector-row"><span>Threat Class:</span><span id="insp-threat">--</span></div>
+              <div class="inspector-row"><span>GNN Attention:</span><span id="insp-att" class="accent-mint">--%</span></div>
+              <div class="inspector-row"><span>Next Hop Pred:</span><span id="insp-pred" class="accent-gold">--%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom: Threat Intelligence Event Log -->
+        <div class="glass-card logs-panel">
+          <div class="panel-header">
+            <h2><span class="diamond">◆</span> Threat Intelligence Stream</h2>
+            <span class="mono" style="font-size: 10px; color: var(--text-secondary);" id="event-rate">0.0 Ev/s</span>
+          </div>
+          <div class="logs-container" id="logs-feed">
+            <div class="log-entry ai"><span class="log-time">[SYS_INIT]</span> Tactical node initialized. Ready for scan injection.</div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- Right Column: GNN Topology & Live Threat Intelligence Logs -->
-    <div class="side-panel">
-      <!-- Top: GNN Attention Graph -->
-      <div class="glass-card gnn-panel">
-        <div class="panel-header">
-          <h2><span class="diamond">◆</span> GNN Relational Attention Graph</h2>
-          <span id="gnn-mode-pill" class="legend-pill tuner">GAT Message Passing</span>
+  <!-- ════════════════════════════════════════════
+       VIEW 2: 3-TIER SANDWICH ARCHITECTURE DASHBOARD
+       ════════════════════════════════════════════ -->
+  <div id="sandwich-dashboard-view" class="view-panel">
+    <div class="sandwich-view-wrap">
+      
+      <!-- Top Hero Banner: Sandwich Pipeline Overview -->
+      <div class="sandwich-hero-strip">
+        <div class="sandwich-hero-left">
+          <h2>
+            3-Tier Sandwich Architecture Command Center
+            <span class="sandwich-hero-badge">SYNCHRONIZED PIPELINE</span>
+          </h2>
+          <p>Decoupled real-time processing: Wideband RF Sensor Ingestion ➔ GNN Relational Reasoning ➔ Sub-2ms Hardware Actuation</p>
         </div>
-        <div class="canvas-wrapper" id="gnn-wrapper">
-          <canvas id="gnn-canvas"></canvas>
-          <!-- Hover Node Inspector HUD -->
-          <div id="node-inspector" class="node-inspector">
-            <div class="inspector-title" id="insp-ch">CHANNEL --</div>
-            <div class="inspector-row"><span>Center Freq:</span><span id="insp-freq">-- GHz</span></div>
-            <div class="inspector-row"><span>Signal Power:</span><span id="insp-pwr">-- dBm</span></div>
-            <div class="inspector-row"><span>Threat Class:</span><span id="insp-threat">--</span></div>
-            <div class="inspector-row"><span>GNN Attention:</span><span id="insp-att" class="accent-mint">--%</span></div>
-            <div class="inspector-row"><span>Next Hop Pred:</span><span id="insp-pred" class="accent-gold">--%</span></div>
+        <div class="sandwich-hero-metrics">
+          <div class="hero-metric-chip">
+            <div class="hero-metric-val">1.8 ms</div>
+            <div class="hero-metric-lbl">Total Pipeline Latency</div>
+          </div>
+          <div class="hero-metric-chip">
+            <div class="hero-metric-val" id="sw-hero-rate">30 FPS / 200 MSps</div>
+            <div class="hero-metric-lbl">Stream Ingestion Rate</div>
+          </div>
+          <div class="hero-metric-chip">
+            <div class="hero-metric-val" id="sw-hero-pd">95.2%</div>
+            <div class="hero-metric-lbl">Interception Accuracy</div>
           </div>
         </div>
       </div>
 
-      <!-- Bottom: Threat Intelligence Event Log -->
-      <div class="glass-card logs-panel">
-        <div class="panel-header">
-          <h2><span class="diamond">◆</span> Threat Intelligence Stream</h2>
-          <span class="mono" style="font-size: 10px; color: var(--text-secondary);" id="event-rate">0.0 Ev/s</span>
+      <!-- Sandwich Tiers Stack -->
+      <div class="sandwich-board-stack">
+
+        <!-- 🥪 TIER 1: RF SENSOR INGESTION & DSP CHANNELIZER (TOP BUN) -->
+        <div class="sandwich-tier-box tier-1-border">
+          <div class="sandwich-tier-header">
+            <div class="tier-title-group">
+              <div class="tier-num-pill pill-t1">T1</div>
+              <div class="tier-headings">
+                <h3>Tier 1: RF Spectrum Ingestion &amp; DSP Channelizer</h3>
+                <div class="tier-sub-title">Wideband SDR Ingestion (2.0 – 18.0 GHz), Polyphase FFT Filter Bank, &amp; PSD Energy Matrices</div>
+              </div>
+            </div>
+            <div class="tier-badges-row">
+              <span class="tag-spec active-cyan">SDR Receiver: Active</span>
+              <span class="tag-spec">Bandwidth: 160 MHz</span>
+              <span class="tag-spec">Noise Floor: -95 dBm</span>
+            </div>
+          </div>
+
+          <div class="sandwich-tier-body">
+            <div class="tier-two-col">
+              <!-- Left: Real-time Multi-Channel PSD Analyzer -->
+              <div class="tier-subcard">
+                <div class="subcard-head">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 22h16"></path><path d="M7 16V8"></path><path d="M12 20V4"></path><path d="M17 18v-6"></path>
+                    </svg>
+                    Real-Time Channelizer Spectrum Analyzer (PSD Meter)
+                  </h4>
+                  <span class="mono" style="font-size: 10.5px; color: var(--text-secondary);" id="sw-t1-active-ch">Active Threat: CH-03</span>
+                </div>
+                <!-- Dynamic Bars Container -->
+                <div class="psd-bars-array" id="psd-bars-container">
+                  <div class="psd-noise-line"><span class="noise-label">Threshold (-95 dBm)</span></div>
+                  <!-- Dynamically populated via JS -->
+                </div>
+              </div>
+
+              <!-- Right: SDR Ingestion Parameters -->
+              <div class="tier-subcard">
+                <div class="subcard-head">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line>
+                    </svg>
+                    SDR Sensor Hardware Specs
+                  </h4>
+                  <span class="tag-spec active-cyan">200 MSps</span>
+                </div>
+                <div class="sdr-spec-grid">
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">RF Range</div>
+                    <div class="spec-val">2.0 – 18.0 GHz</div>
+                  </div>
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">ADC Resolution</div>
+                    <div class="spec-val">14-bit Dual IQ</div>
+                  </div>
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">DSP Channelizer</div>
+                    <div class="spec-val">1024-Pt FFT Bank</div>
+                  </div>
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">DSP Pipe Latency</div>
+                    <div class="spec-val accent-cyan">0.4 ms</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="logs-container" id="logs-feed">
-          <div class="log-entry ai"><span class="log-time">[SYS_INIT]</span> Tactical node initialized. Ready for scan injection.</div>
+
+        <!-- ── ANIMATED DATA PIPE 1 (T1 ➔ T2) ── -->
+        <div class="tier-connector-pipe">
+          <div class="pipe-label-group">
+            <span class="pipe-pulse-dot pulse-t1-t2"></span>
+            <span class="pipe-text">⬇ DOWNSTREAM DATA FLOW:</span>
+            <span class="pipe-subtext">PSD Channel Energy Matrices [Batch, 12, 1024] &amp; Relational IQ Feature Tensors</span>
+          </div>
+          <span class="pipe-flow-rate">Latency: 0.4 ms • Stream: 30 Hz</span>
         </div>
+
+        <!-- 🥪 TIER 2: AI COGNITIVE DECISION BRAIN (CORE FILLING) -->
+        <div class="sandwich-tier-box tier-2-border">
+          <div class="sandwich-tier-header">
+            <div class="tier-title-group">
+              <div class="tier-num-pill pill-t2">T2</div>
+              <div class="tier-headings">
+                <h3>Tier 2: AI Cognitive Decision Brain (The Filling)</h3>
+                <div class="tier-sub-title">Graph Attention Network (GAT Relational Reasoning) + Deep Q-Network (DQN Predictive Policy)</div>
+              </div>
+            </div>
+            <div class="tier-badges-row">
+              <span class="tag-spec active-blue">Dual-Core AI Agent</span>
+              <span class="tag-spec">GAT Heads: 4</span>
+              <span class="tag-spec">Prediction Lookahead: 1 Hop</span>
+            </div>
+          </div>
+
+          <div class="sandwich-tier-body">
+            <div class="tier-two-col">
+              <!-- Left: GNN Relational Attention Matrix -->
+              <div class="tier-subcard">
+                <div class="subcard-head">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path>
+                    </svg>
+                    GNN Relational Attention Matrix (α<sub>ij</sub> Weights)
+                  </h4>
+                  <span class="tag-spec active-blue" id="sw-gnn-heads-badge">4-Head GAT</span>
+                </div>
+                <!-- 12x12 Dynamic Attention Heat Grid -->
+                <div class="gnn-matrix-grid" id="gnn-matrix-container">
+                  <!-- Dynamically populated via JS -->
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace;">
+                  <span>Channel Correlation Spatial Weights</span>
+                  <span>Equation: e<sub>ij</sub> = LeakyReLU(a<sup>T</sup>[Wh<sub>i</sub> || Wh<sub>j</sub>])</span>
+                </div>
+              </div>
+
+              <!-- Right: DQN Action Policy Q-Value Distribution -->
+              <div class="tier-subcard">
+                <div class="subcard-head">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    DQN Policy Q-Values: Q(s, a)
+                  </h4>
+                  <span class="tag-spec active-blue" id="sw-pred-badge">Next Hop: CH-07 (95.4%)</span>
+                </div>
+                <!-- Q-Value Bars Array -->
+                <div class="dqn-q-distribution" id="dqn-q-container">
+                  <!-- Dynamically populated via JS -->
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace;">
+                  <span>Policy: ε-Greedy (ε=0.02)</span>
+                  <span class="accent-mint">Inference Time: 0.8 ms</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ANIMATED DECISION PIPE 2 (T2 ➔ T3) ── -->
+        <div class="tier-connector-pipe">
+          <div class="pipe-label-group">
+            <span class="pipe-pulse-dot pulse-t2-t3"></span>
+            <span class="pipe-text">⬇ OPTIMAL TUNING ACTION:</span>
+            <span class="pipe-subtext" id="pipe2-action-text">Command: Lock Synthesizer to Predicted Target Channel (Action a* = CH-07 @ 9.4 GHz)</span>
+          </div>
+          <span class="pipe-flow-rate">Inference: 0.8 ms • Lookahead: +1 Hop</span>
+        </div>
+
+        <!-- 🥪 TIER 3: HARDWARE ACTUATION & TELEMETRY (BOTTOM BUN) -->
+        <div class="sandwich-tier-box tier-3-border">
+          <div class="sandwich-tier-header">
+            <div class="tier-title-group">
+              <div class="tier-num-pill pill-t3">T3</div>
+              <div class="tier-headings">
+                <h3>Tier 3: Hardware Tuner Actuation &amp; Tactical Telemetry</h3>
+                <div class="tier-sub-title">Sub-2ms Fast RF Synthesizer Lock, Intercept Verification, &amp; Mission Telemetry Feed</div>
+              </div>
+            </div>
+            <div class="tier-badges-row">
+              <span class="tag-spec active-green">Hardware Lock: &lt;1.8 ms</span>
+              <span class="tag-spec">Threat Level: Real-Time</span>
+              <span class="tag-spec">Lock State: Phase-Locked</span>
+            </div>
+          </div>
+
+          <div class="sandwich-tier-body">
+            <div class="tier-three-col">
+              <!-- Subcard 1: RF Synthesizer Controller -->
+              <div class="tier-subcard">
+                <div class="subcard-head">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                    </svg>
+                    Fast RF Synthesizer Controller
+                  </h4>
+                  <span class="synth-status-pill locked" id="sw-synth-status">⚡ PHASE LOCKED</span>
+                </div>
+                <div class="synth-controller-grid">
+                  <div class="synth-box">
+                    <div class="spec-lbl">Tuned Center Frequency</div>
+                    <div class="synth-freq-big accent-mint" id="sw-synth-freq">9.40 GHz</div>
+                  </div>
+                  <div class="synth-box">
+                    <div class="spec-lbl">PLL Slew / Lock Latency</div>
+                    <div class="synth-freq-big" style="color: var(--accent-blue);">0.6 ms</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Subcard 2: Tactical Threat Telemetry -->
+              <div class="tier-subcard">
+                <div class="subcard-head">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    Threat Telemetry &amp; Verification
+                  </h4>
+                  <span class="tag-spec active-green" id="sw-threat-class">FHSS Agile Radar</span>
+                </div>
+                <div class="sdr-spec-grid">
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">Detection Pd</div>
+                    <div class="spec-val accent-mint" id="sw-t3-pd">95.2%</div>
+                  </div>
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">False Alarm Pfa</div>
+                    <div class="spec-val" style="color: var(--accent-cyan);" id="sw-t3-pfa">1.1%</div>
+                  </div>
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">Countermeasure</div>
+                    <div class="spec-val">Synchronous Lock</div>
+                  </div>
+                  <div class="sdr-spec-item">
+                    <div class="spec-lbl">Total Intercepts</div>
+                    <div class="spec-val" id="sw-t3-hits">0 Hits</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Subcard 3: Real-Time Actuation Stream -->
+              <div class="tier-subcard">
+                <div class="subcard-head">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Live Mission Event Stream
+                  </h4>
+                  <span class="tag-spec">Real-Time</span>
+                </div>
+                <div class="logs-container" id="sw-actuation-logs" style="height: 90px; font-size: 10px;">
+                  <div class="log-entry ai"><span class="log-time">[T3_READY]</span> Actuator PLL locked to AI guidance loop.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -197,7 +502,7 @@
       <!-- 3. Interceptions / Total Hops -->
       <div class="metric-item">
         <div class="metric-icon-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--neon-mint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="22" y1="12" x2="18" y2="12"></line>
             <line x1="6" y1="12" x2="2" y2="12"></line>
@@ -214,13 +519,13 @@
       <!-- 4. Reaction Latency -->
       <div class="metric-item">
         <div class="metric-icon-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--neon-cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
         </div>
         <div class="metric-val-group">
           <span class="metric-val cyan" id="val-latency">1.8 ms</span>
-          <span class="metric-lbl">AI Tuning Latency</span>
+          <span class="metric-lbl">End-to-End Latency</span>
         </div>
       </div>
 
@@ -378,7 +683,7 @@
                 </h4>
                 <p>Captures continuous wideband RF spectrum via Software Defined Radio (SDR), executes high-speed FFT channelization, and outputs power spectral density matrices at 30 FPS.</p>
                 <div class="sandwich-tier-metrics">
-                  <span class="sandwich-tag">12–24 RF Channels</span>
+                  <span class="sandwich-tag">12–20 RF Channels</span>
                   <span class="sandwich-tag">Noise Floor: -95 dBm</span>
                   <span class="sandwich-tag">30 FPS Stream</span>
                 </div>
@@ -427,11 +732,8 @@
       </div>
     </div>
   </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Main JavaScript Engine -->
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
